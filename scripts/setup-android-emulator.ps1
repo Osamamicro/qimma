@@ -83,7 +83,8 @@ function Invoke-Streamed {
     $previous = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
     try {
-        & $FilePath @Arguments
+        # Out-Host keeps the tool's output out of this function's return value.
+        & $FilePath @Arguments | Out-Host
         return $LASTEXITCODE
     } finally {
         $ErrorActionPreference = $previous
@@ -92,6 +93,18 @@ function Invoke-Streamed {
 
 function Get-JavaMajor {
     $java = 'java'
+    # A fresh Android Studio install sets neither JAVA_HOME nor PATH. Use its bundled JDK, and
+    # export JAVA_HOME for this session because sdkmanager.bat and avdmanager.bat need it too.
+    if (-not $env:JAVA_HOME -and -not (Get-Command -Name 'java' -ErrorAction SilentlyContinue)) {
+        $studioJbr = @(
+            (Join-Path $env:ProgramFiles 'Android\Android Studio\jbr'),
+            (Join-Path $env:LOCALAPPDATA 'Programs\Android Studio\jbr')
+        ) | Where-Object { Test-Path -LiteralPath (Join-Path $_ 'bin\java.exe') } | Select-Object -First 1
+        if ($studioJbr) {
+            $env:JAVA_HOME = $studioJbr
+            Write-Info "Using the JDK bundled with Android Studio: $studioJbr"
+        }
+    }
     if ($env:JAVA_HOME) {
         $candidate = Join-Path $env:JAVA_HOME 'bin\java.exe'
         if (Test-Path -LiteralPath $candidate) { $java = $candidate }
@@ -195,8 +208,19 @@ Write-Ok 'sdkmanager and avdmanager found'
 # ---- 4. Licences and packages -----------------------------------------------------
 Write-Step 'Licences and packages'
 Write-Info 'Accepting SDK licences (already accepted ones are skipped).'
-$yes = @(1..50 | ForEach-Object { 'y' })
-$null = Invoke-Native -FilePath $sdkManager -Arguments @("--sdk_root=$sdk", '--licenses') -InputLines $yes
+# Piping input from PowerShell into sdkmanager.bat does not reach its Java prompt, so feed the
+# answers through cmd.exe redirection from a temporary file instead.
+$yesFile = Join-Path $env:TEMP 'qimma-sdk-licenses.txt'
+Set-Content -LiteralPath $yesFile -Value @(1..50 | ForEach-Object { 'y' }) -Encoding Ascii
+$licences = Invoke-Native -FilePath 'cmd.exe' -Arguments @('/c', "`"`"$sdkManager`" --sdk_root=`"$sdk`" --licenses < `"$yesFile`"`"")
+Remove-Item -LiteralPath $yesFile -ErrorAction SilentlyContinue
+if (-not (Test-Path -LiteralPath (Join-Path $sdk 'licenses\android-sdk-license'))) {
+    Write-Fail 'The SDK licences were not accepted. Run this and answer y to each prompt, then run this script again:'
+    Write-Host "  `"$sdkManager`" --sdk_root=`"$sdk`" --licenses"
+    $licences.Output | Select-Object -Last 5 | ForEach-Object { Write-Host "  $_" }
+    exit 1
+}
+Write-Ok 'SDK licences accepted'
 
 $sysImage = "system-images;android-$ApiLevel;google_apis;$abi"
 $packages = @('platform-tools', 'emulator', "platforms;android-$ApiLevel", $sysImage)
@@ -237,6 +261,16 @@ if ($avdList -contains $AvdName) {
         Write-Fail "Could not create the AVD. In Android Studio: Device Manager > Create device, and name it $AvdName."
         exit 1
     }
+}
+
+# Command-line AVDs default to hw.keyboard=no, which blocks typing essays with the PC keyboard.
+$avdHome = $env:ANDROID_AVD_HOME
+if (-not $avdHome) { $avdHome = Join-Path $env:USERPROFILE '.android\avd' }
+$avdConfig = Join-Path $avdHome "$AvdName.avd\config.ini"
+if (Test-Path -LiteralPath $avdConfig) {
+    $lines = @(Get-Content -LiteralPath $avdConfig | Where-Object { $_ -notmatch '^hw\.keyboard\s*=' })
+    Set-Content -LiteralPath $avdConfig -Value ($lines + 'hw.keyboard=yes') -Encoding Ascii
+    Write-Ok 'PC keyboard enabled for the AVD (hw.keyboard=yes)'
 }
 
 # ---- 6. Hardware virtualisation ------------------------------------------------------

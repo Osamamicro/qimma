@@ -29,7 +29,7 @@ export default function TodayScreen() {
   const todayCount = attempts.filter((a) => new Date(a.at).toDateString() === new Date(now).toDateString()).length;
 
   return (
-    <Screen>
+    <Screen headerless>
       <View style={{ gap: 4 }}>
         <Text variant="title">Qimma</Text>
         <Text tone="muted">Reach the summit: practise every PTE task type with instant, explained feedback.</Text>

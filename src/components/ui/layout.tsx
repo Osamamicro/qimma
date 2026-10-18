@@ -1,13 +1,25 @@
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, View, type ScrollViewProps, type StyleProp, type ViewStyle } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { MAX_WIDTH, radius, space, useColors } from '@/theme';
 
 import { Text } from './text';
 
-/** Scrollable page with centred, width-limited content. Use as the first child of a route. */
-export function Screen({ children, contentContainerStyle, ...rest }: ScrollViewProps & { children: ReactNode }) {
+/**
+ * Scrollable page with centred, width-limited content. Use as the first child of a route.
+ * Set `headerless` on routes without a navigation header (the tabs): Android draws edge to edge
+ * and `contentInsetAdjustmentBehavior` only works on iOS, so the status bar inset is added here.
+ */
+export function Screen({
+  children,
+  contentContainerStyle,
+  headerless = false,
+  ...rest
+}: ScrollViewProps & { children: ReactNode; headerless?: boolean }) {
   const c = useColors();
+  const insets = useSafeAreaInsets();
+  const topInset = headerless && process.env.EXPO_OS === 'android' ? insets.top : 0;
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
@@ -15,7 +27,7 @@ export function Screen({ children, contentContainerStyle, ...rest }: ScrollViewP
       style={{ backgroundColor: c.background }}
       {...rest}
       contentContainerStyle={[
-        { padding: space.lg, paddingBottom: space.xxl * 2, gap: space.lg, width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
+        { padding: space.lg, paddingTop: space.lg + topInset, paddingBottom: space.xxl * 2, gap: space.lg, width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
         contentContainerStyle,
       ]}>
       {children}

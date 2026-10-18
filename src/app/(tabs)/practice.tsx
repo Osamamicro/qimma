@@ -16,7 +16,7 @@ export default function PracticeScreen() {
   const available = ALL_ITEMS.filter((i) => itemFitsExam(i, exam.id));
 
   return (
-    <Screen>
+    <Screen headerless>
       <View style={{ gap: 4 }}>
         <Text variant="title">Practice</Text>
         <Text tone="muted">{exam.name} · every task type, scored the way PTE scores it.</Text>
