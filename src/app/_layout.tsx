@@ -1,7 +1,8 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 
+import { StorageBanner } from '@/features/backup/storage-banner';
 import { useColors } from '@/theme';
 
 export default function RootLayout() {
@@ -15,15 +16,18 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={theme}>
       <StatusBar style="auto" />
-      <Stack screenOptions={{ headerBackButtonDisplayMode: 'minimal', contentStyle: { backgroundColor: c.background } }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false, title: 'Home' }} />
-        <Stack.Screen name="practice/[type]/index" options={{ title: 'Practice' }} />
-        <Stack.Screen name="practice/[type]/[id]" options={{ title: 'Question' }} />
-        <Stack.Screen name="mock/[kind]" options={{ title: 'Mock test', gestureEnabled: false }} />
-        <Stack.Screen name="mock/result/[id]" options={{ title: 'Mock report' }} />
-        <Stack.Screen name="vocab/review" options={{ title: 'Vocabulary review' }} />
-        <Stack.Screen name="settings" options={{ title: 'Settings', presentation: 'modal' }} />
-      </Stack>
+      <View style={{ flex: 1 }}>
+        <StorageBanner />
+        <Stack screenOptions={{ headerBackButtonDisplayMode: 'minimal', contentStyle: { backgroundColor: c.background } }}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false, title: 'Home' }} />
+          <Stack.Screen name="practice/[type]/index" options={{ title: 'Practice' }} />
+          <Stack.Screen name="practice/[type]/[id]" options={{ title: 'Question' }} />
+          <Stack.Screen name="mock/[kind]" options={{ title: 'Mock test', gestureEnabled: false }} />
+          <Stack.Screen name="mock/result/[id]" options={{ title: 'Mock report' }} />
+          <Stack.Screen name="vocab/review" options={{ title: 'Vocabulary review' }} />
+          <Stack.Screen name="settings" options={{ title: 'Settings', presentation: 'modal' }} />
+        </Stack>
+      </View>
     </ThemeProvider>
   );
 }

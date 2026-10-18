@@ -29,7 +29,7 @@ Run every npm command in `repos\qimma`, which contains `package.json`.
 ```powershell
 npm install
 npx expo start --web --port 8099   # wait for "Waiting on http://localhost:8099", then Ctrl+C
-npm run check                      # expect a clean typecheck and 237 passing tests
+npm run check                      # expect a clean typecheck and 259 passing tests
 ```
 
 ## 3. Backlog item 1: emulator (only this PC can do it)
@@ -77,7 +77,7 @@ These came from reading the scripts. **None of them has been confirmed on Window
   repo to a short path such as `C:\dev\qimma`. A synced Desktop can make `npm install` fail
   with `EPERM`.
 
-## 4. Backlog item 2: progress export/import, decided in ADR-013 (not started)
+## 4. Backlog item 2: progress export/import, decided in ADR-013 (built; emulator check pending)
 
 - **Pure core** (new `src/core/backup/`):
   - The format is `{ app: 'qimma', version: 1, exportedAt, data: { settings, attempts, vocab,

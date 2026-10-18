@@ -24,16 +24,16 @@ Australian Home Affairs scale, R69 L70 S88 W85 on PTE Academic.
 | Content | 238 original items, 220 vocabulary entries, a strategy guide per task type (`src/content/`). |
 | Scoring | Exact PTE rules for objective tasks. Trait-level heuristic estimates for speaking and writing, with a 25% on-topic floor (`src/core/scoring`). |
 | Official data | Pearson weighting (Aug 2025), DHA 2025 targets and test-structure ranges, all in `src/core/exams/`. |
-| Features | Practice player, full/mini/section mocks + report, vocab SRS (SM-2), daily plan, progress, settings. |
-| Quality | `tsc` clean, Vitest 237/237, web export OK, 8 Playwright end-to-end flows pass at a 390px viewport. |
+| Features | Practice player, full/mini/section mocks + report, vocab SRS (SM-2), daily plan, progress, settings, progress backup (JSON export/import with merge, storage-failure banner; ADR-013). |
+| Quality | `tsc` clean, Vitest 259/259, web export OK, 8 Playwright end-to-end flows pass at a 390px viewport. |
 | Emulator | `scripts/setup-android-emulator.{ps1,sh}` (one-time setup) + `npm run emulator:android`. |
 
 **Not verified yet:** a real Android emulator boot, the PowerShell script on Windows, and
 microphone/text-to-speech behaviour on a device. The original sandbox had no KVM and no `pwsh`.
 
-**Last check (2026-10-18, cloud, in `Osamamicro/qimma`):** `npm ci`, typed routes and
-`npm run check` (tsc clean, 237/237) are green. No app code changed. Item 1 needs the owner's
-PC (`docs/LOCAL-PC.md`). Item 2 is designed and decided (ADR-013) but has no code yet.
+**Last check (2026-10-18, owner's Windows PC):** `npm run check` (tsc clean, 259/259) and the
+web build are green. Item 2 (backup) is built and was exercised in the browser: export, import
+with merge preview, and the storage-failure banner. Its emulator check waits on item 1.
 
 ## 3. First 10 minutes
 
@@ -42,7 +42,7 @@ git clone https://github.com/Osamamicro/qimma.git
 cd qimma
 npm install
 npx expo start --web --port 8099   # once, then Ctrl+C: generates .expo/types for typed routes
-npm run check                      # typecheck + 237 tests; must be green before you change anything
+npm run check                      # typecheck + 259 tests; must be green before you change anything
 npm run web                        # Chrome/Edge (speech scoring needs the Web Speech API)
 npm run emulator:android           # after the one-time setup script; see docs/EMULATOR.md
 ```
@@ -99,7 +99,9 @@ Each item lists *done when*.
    what breaks: SDK paths, AVD flags, the Expo Go version. Start with the risk list in
    `docs/LOCAL-PC.md` §3. *Done when* the app opens in the
    emulator, a Repeat Sentence item plays audio, and the microphone records.
-2. **Progress export/import (ADR-006, decided in ADR-013).** Build plan: `docs/LOCAL-PC.md` §4. Add a JSON export/import of settings, attempts, SRS and
+2. **Progress export/import (ADR-006, decided in ADR-013). Built; web verified.** Remaining: run
+   Export and Import once in the emulator (needs item 1). Code: `src/core/backup/`,
+   `src/services/backup-file{,.web}.ts`, `src/features/backup/`. Original scope: a JSON export/import of settings, attempts, SRS and
    mocks in Settings, with a schema `version` field and a storage-full warning. *Done when* a
    round-trip test passes and the UI works on web and in the emulator.
 3. **AI scoring service, writing first (ADR-008).** A Supabase Edge Function (TypeScript) that
