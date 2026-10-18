@@ -38,3 +38,8 @@ export function review(card: SrsCard, grade: Grade, now: number): SrsCard {
 export function isDue(card: SrsCard | undefined, now: number): boolean {
   return card === undefined || card.due <= now;
 }
+
+/** When the card was last reviewed (or created): `review()` always sets `due = now + interval * DAY`. */
+export function reviewedAt(card: SrsCard): number {
+  return card.due - card.interval * DAY;
+}

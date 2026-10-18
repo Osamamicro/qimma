@@ -4,6 +4,7 @@ import { Alert, Switch, TextInput, View } from 'react-native';
 
 import { Button, Card, Chip, Row, Screen, Text } from '@/components/ui';
 import { EXAM_LIST, SCORE_TARGETS } from '@/core';
+import { BackupCard } from '@/features/backup/backup-card';
 import { resetAllData, selectExam, updateSettings, useSettings } from '@/services/app-state';
 import { radius, space, useColors } from '@/theme';
 
@@ -124,10 +125,12 @@ export default function SettingsScreen() {
         </Row>
       </Card>
 
+      <BackupCard />
+
       <Button label="Save" size="lg" disabled={!dateValid} onPress={save} />
       <Button label="Reset all data on this device" variant="ghost" onPress={confirmReset} />
       <Text variant="small" tone="faint">
-        Your progress is stored only on this device. Qimma is an independent study tool and is not affiliated with or
+        Your progress is stored only on this device. Export a backup to move it or keep it safe. Qimma is an independent study tool and is not affiliated with or
         endorsed by Pearson. PTE is a trademark of Pearson.
       </Text>
     </Screen>

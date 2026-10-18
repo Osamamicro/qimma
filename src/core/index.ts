@@ -6,5 +6,7 @@ export * from './content/validate';
 export * from './scoring';
 export * from './srs/sm2';
 export * from './progress/estimate';
+export * from './progress/records';
+export * from './backup/backup';
 export * from './mock/assemble';
 export * from './plan/study-plan';

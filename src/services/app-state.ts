@@ -1,63 +1,19 @@
-import type { ExamId, Grade, Item, Response, ScoreResult, SkillId, SrsCard, TaskTypeId } from '@/core';
-import { getTarget, newCard, resolveSkillTargets, review } from '@/core';
+import type { Attempt, BackupData, BackupFile, ExamId, Grade, Item, MockRecord, Response, ScoreResult, Settings, SkillId, SrsCard } from '@/core';
+import { createBackup, DEFAULT_SETTINGS, getTarget, MAX_ATTEMPTS, MAX_MOCKS, mergeBackup, newCard, resolveSkillTargets, review } from '@/core';
 
 import { createStore } from './storage';
 
-export interface Settings {
-  examId: ExamId;
-  /** Preset goal id (e.g. 'dha-superior'), or null for a custom overall target. */
-  targetId: string | null;
-  /** Custom overall target (used when targetId is null). */
-  targetScore: number;
-  examDate: string | null;
-  dailyMinutes: number;
-  /** Exam mode: audio plays once, timers enforced, no spellcheck. */
-  examMode: boolean;
-  /** TTS speaking rate multiplier for listening prompts. */
-  speechRate: number;
-  onboarded: boolean;
-}
-
-export const DEFAULT_SETTINGS: Settings = {
-  examId: 'pte-academic',
-  targetId: null,
-  targetScore: 65,
-  examDate: null,
-  dailyMinutes: 45,
-  examMode: false,
-  speechRate: 1,
-  onboarded: false,
-};
-
-export interface Attempt {
-  id: string;
-  itemId: string;
-  taskType: TaskTypeId;
-  at: number;
-  total: number;
-  max: number;
-  percent: number;
-  estimated: boolean;
-  /** Optional mock-test id when the attempt was part of a mock. */
-  mockId?: string;
-}
-
-export interface MockRecord {
-  id: string;
-  examId: ExamId;
-  kind: string;
-  startedAt: number;
-  finishedAt: number;
-  results: { itemId: string; taskType: TaskTypeId; result: ScoreResult }[];
-}
+// The record types live in core (backup and sync need them); re-exported for existing imports.
+export type { Attempt, MockRecord, Settings } from '@/core';
+export { DEFAULT_SETTINGS } from '@/core';
 
 export const settingsStore = createStore<Settings>('settings', DEFAULT_SETTINGS);
 export const attemptsStore = createStore<Attempt[]>('attempts', []);
 export const vocabStore = createStore<Record<string, SrsCard>>('vocab-srs', {});
 export const bookmarksStore = createStore<string[]>('bookmarks', []);
 export const mocksStore = createStore<MockRecord[]>('mocks', []);
-
-const MAX_ATTEMPTS = 2000;
+/** Epoch ms of the last export. Its own key, so importing settings never overwrites it. */
+export const lastBackupStore = createStore<number | null>('last-backup', null);
 
 export const uid = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -108,7 +64,7 @@ export function toggleBookmark(itemId: string) {
 }
 
 export function saveMock(record: MockRecord) {
-  mocksStore.update((list) => [record, ...list].slice(0, 50));
+  mocksStore.update((list) => [record, ...list].slice(0, MAX_MOCKS));
 }
 
 export function resetAllData() {
@@ -117,4 +73,39 @@ export function resetAllData() {
   vocabStore.set({});
   bookmarksStore.set([]);
   mocksStore.set([]);
+}
+
+function currentData(): BackupData {
+  return {
+    settings: { ...DEFAULT_SETTINGS, ...settingsStore.get() },
+    attempts: attemptsStore.get(),
+    vocab: vocabStore.get(),
+    bookmarks: bookmarksStore.get(),
+    mocks: mocksStore.get(),
+  };
+}
+
+export function exportBackup(now = Date.now()): BackupFile {
+  return createBackup(currentData(), now);
+}
+
+export function markBackedUp(now = Date.now()) {
+  lastBackupStore.set(now);
+}
+
+/** What an import would do, without writing anything (shown to the learner before confirming). */
+export function previewImport(incoming: BackupData) {
+  return mergeBackup(currentData(), incoming);
+}
+
+/** Writes merged data to every store. Returns false if any store could not be persisted. */
+export function applyImport(data: BackupData): boolean {
+  const results = [
+    settingsStore.set(data.settings),
+    attemptsStore.set(data.attempts),
+    vocabStore.set(data.vocab),
+    bookmarksStore.set(data.bookmarks),
+    mocksStore.set(data.mocks),
+  ];
+  return results.every(Boolean);
 }
