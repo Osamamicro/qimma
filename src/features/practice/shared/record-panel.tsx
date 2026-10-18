@@ -134,7 +134,7 @@ export function RecordPanel({ prepSec, responseSec, mode, ready = true, autoStar
           {response.transcript !== null && (
             <View style={{ gap: 4 }}>
               <Text variant="caption" tone="muted">
-                WHAT WE HEARD
+                What we heard
               </Text>
               <Text selectable>{response.transcript || '(nothing recognised)'}</Text>
             </View>

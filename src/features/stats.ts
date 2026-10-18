@@ -22,13 +22,13 @@ export function statsByType(attempts: Attempt[]): Partial<Record<TaskTypeId, Typ
 }
 
 export function useAttempts() {
-  return attemptsStore.use();
+  return attemptsStore.useValue();
 }
 
 /** Score estimate using the current exam's published question-type weighting. */
 export function useEstimate() {
   const attempts = useAttempts();
-  const examId = settingsStore.use().examId ?? 'pte-academic';
+  const examId = settingsStore.useValue().examId ?? 'pte-academic';
   return useMemo(() => estimateScores(attempts, getExam(examId)), [attempts, examId]);
 }
 

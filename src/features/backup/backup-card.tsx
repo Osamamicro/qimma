@@ -21,7 +21,7 @@ const errorText = (e: unknown) => (e instanceof Error ? e.message : String(e));
 type Status = { tone: 'danger' | 'success'; text: string } | null;
 
 export function BackupCard() {
-  const last = lastBackupStore.use();
+  const last = lastBackupStore.useValue();
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<Status>(null);
 

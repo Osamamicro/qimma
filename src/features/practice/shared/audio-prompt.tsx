@@ -130,7 +130,7 @@ export function AudioPrompt({ item, mode, onFinished, showTranscript }: AudioPro
       {showTranscript && utterances.length > 0 && (
         <View style={{ gap: 6 }}>
           <Text variant="caption" tone="muted">
-            TRANSCRIPT
+            Transcript
           </Text>
           {utterances.map((u, i) => (
             <Text key={i} selectable>

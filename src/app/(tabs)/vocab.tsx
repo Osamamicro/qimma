@@ -14,7 +14,7 @@ const STATUS_LABEL: Record<CardStatus, string> = { new: 'New', due: 'Due', learn
 
 export default function VocabTab() {
   const c = useColors();
-  const cards = vocabStore.use();
+  const cards = vocabStore.useValue();
   const now = Date.now();
   const [query, setQuery] = useState('');
   const [tag, setTag] = useState<string | null>(null);
@@ -112,8 +112,8 @@ export default function VocabTab() {
                   {e.definition}
                 </Text>
                 <Row style={{ justifyContent: 'space-between' }}>
-                  <Text variant="caption" style={{ color: statusColor[status] }}>
-                    {STATUS_LABEL[status].toUpperCase()}
+                  <Text variant="caption" style={{ color: statusColor[status], fontWeight: '600' }}>
+                    {STATUS_LABEL[status]}
                   </Text>
                   <Text variant="small" tone="faint">
                     {e.tags.join(' · ')}

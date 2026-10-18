@@ -29,7 +29,7 @@ export function selectExam(examId: ExamId) {
 }
 
 export function useSettings(): Settings {
-  return { ...DEFAULT_SETTINGS, ...settingsStore.use() };
+  return { ...DEFAULT_SETTINGS, ...settingsStore.useValue() };
 }
 
 /** Per-skill minimums for the learner's goal (preset or custom). */

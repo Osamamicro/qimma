@@ -54,7 +54,7 @@ export default function SettingsScreen() {
         {s.examId === 'pte-academic' && (
           <View style={{ gap: 6 }}>
             <Text variant="small" tone="muted">
-              Australian visa levels (Home Affairs, from 7 Aug 2025) — minimum per skill:
+              Australian visa levels (Home Affairs, from 7 Aug 2025), minimum per skill:
             </Text>
             <Row>
               {SCORE_TARGETS.map((t) => (
@@ -109,7 +109,7 @@ export default function SettingsScreen() {
           <View style={{ flex: 1, gap: 2 }}>
             <Text variant="subheading">Exam mode</Text>
             <Text variant="small" tone="muted">
-              Audio plays once, no spellcheck or autocorrect — just like test day.
+              Audio plays once, no spellcheck or autocorrect, as on test day.
             </Text>
           </View>
           <Switch value={s.examMode} onValueChange={(v) => updateSettings({ examMode: v })} />

@@ -11,8 +11,8 @@ export function Passage({ text, label }: { text: string; label?: string }) {
   return (
     <View style={{ gap: 6, backgroundColor: c.surface, borderColor: c.border, borderWidth: 1, borderRadius: radius.lg, padding: space.lg }}>
       {label ? (
-        <Text variant="caption" tone="muted">
-          {label.toUpperCase()}
+        <Text variant="small" tone="muted" style={{ fontWeight: '600' }}>
+          {label}
         </Text>
       ) : null}
       <Text variant="reading" selectable>

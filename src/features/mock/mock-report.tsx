@@ -40,7 +40,7 @@ export function MockReport({ record }: { record: MockRecord }) {
 
       <Card>
         <Row style={{ alignItems: 'flex-start' }} gap={16}>
-          <Stat label="Estimated overall" value={overall === null ? '—' : String(overall)} color={c.primary} />
+          <Stat label="Estimated overall" value={overall === null ? 'n/a' : String(overall)} color={c.primary} />
           <Stat label="Unanswered" value={String(summary.unanswered)} color={summary.unanswered > 0 ? c.warning : undefined} />
         </Row>
         <Text variant="small" tone="muted">
@@ -92,13 +92,13 @@ export function MockReport({ record }: { record: MockRecord }) {
       <Card>
         <Row style={{ justifyContent: 'space-between' }}>
           <Text variant="caption" tone="muted" style={{ flex: 1 }}>
-            TASK
+            Task
           </Text>
           <Text variant="caption" tone="muted" style={{ width: 72, textAlign: 'right' }}>
-            ANSWERED
+            Answered
           </Text>
           <Text variant="caption" tone="muted" style={{ width: 56, textAlign: 'right' }}>
-            AVG
+            Average
           </Text>
         </Row>
         {summary.rows.map((r) => (
@@ -150,7 +150,7 @@ export function MockReport({ record }: { record: MockRecord }) {
                     <Row key={t.id} style={{ justifyContent: 'space-between' }}>
                       <Text variant="small">{t.label}</Text>
                       <Text variant="small" tone="muted" style={{ fontVariant: ['tabular-nums'] }}>
-                        {t.unscored ? '—' : `${t.score} / ${t.max}`}
+                        {t.unscored ? 'not scored' : `${t.score} / ${t.max}`}
                       </Text>
                     </Row>
                   ))}
@@ -162,7 +162,7 @@ export function MockReport({ record }: { record: MockRecord }) {
                   {r.result.answer ? (
                     <View style={{ gap: 4 }}>
                       <Text variant="caption" tone="muted">
-                        {spec.hasModelAnswer ? 'MODEL ANSWER' : 'CORRECT ANSWER'}
+                        {spec.hasModelAnswer ? 'Model answer' : 'Correct answer'}
                       </Text>
                       <Text selectable>{r.result.answer}</Text>
                     </View>

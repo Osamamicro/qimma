@@ -35,8 +35,8 @@ export function ClozeText({ label, text, gaps, onGapPress, disabled }: ClozeText
   return (
     <View style={{ gap: 6, backgroundColor: c.surface, borderColor: c.border, borderWidth: 1, borderRadius: radius.lg, padding: space.lg }}>
       {label ? (
-        <Text variant="caption" tone="muted">
-          {label.toUpperCase()}
+        <Text variant="small" tone="muted" style={{ fontWeight: '600' }}>
+          {label}
         </Text>
       ) : null}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: 5, rowGap: 8 }}>
@@ -80,7 +80,7 @@ function Slot({
     status === 'correct' ? c.success : status === 'wrong' ? c.danger : filled || gap?.active ? c.primary : c.border;
   const bg = status === 'correct' ? c.successSoft : status === 'wrong' ? c.dangerSoft : filled ? c.primarySoft : c.surfaceAlt;
   const fg = status === 'correct' ? c.success : status === 'wrong' ? c.danger : filled ? c.text : c.textFaint;
-  const shown = value ?? (status ? '—' : '▾ choose');
+  const shown = value ?? (status ? 'blank' : '▾ choose');
 
   const spoken =
     status === 'wrong'

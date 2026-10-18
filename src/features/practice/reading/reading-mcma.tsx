@@ -27,7 +27,7 @@ export function ReadingMCMARenderer({ item, mode, onSubmit, onDraft, result }: R
       <Passage text={item.passage} />
       <Passage label="Question" text={item.question} />
       <Text variant="caption" tone="muted">
-        SELECT ALL THAT APPLY
+        Select all that apply
       </Text>
       <ChoiceList
         options={item.options}

@@ -15,7 +15,7 @@ export default function MockTab() {
   const c = useColors();
   const settings = useSettings();
   const exam = getExam(settings.examId);
-  const mocks = mocksStore.use();
+  const mocks = mocksStore.useValue();
   const full = useMemo(() => planMock(exam, ALL_ITEMS, 'full'), [exam]);
   const mini = useMemo(() => planMock(exam, ALL_ITEMS, 'mini'), [exam]);
   const sectionCards = useMemo(
@@ -83,7 +83,7 @@ export default function MockTab() {
                     variant="heading"
                     accessibilityLabel={`Estimated overall ${summary.estimate.overall ?? 'not available'}`}
                     style={{ color: c.primary, fontVariant: ['tabular-nums'] }}>
-                    {summary.estimate.overall ?? '—'}
+                    {summary.estimate.overall ?? 'n/a'}
                   </Text>
                 </View>
               </Row>

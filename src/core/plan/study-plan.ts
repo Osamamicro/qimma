@@ -117,7 +117,7 @@ export function buildDailyPlan(
   }
   // Anchors so long, heavily weighted tasks are not starved by quick ones (council D4):
   // Describe Image daily, and one long task per day on a rotation that covers each weekly.
-  if (has('describe-image') && (gaps.speaking ?? 1) > 0) add('describe-image', 2, `${exam.weights['describe-image']!.skills.speaking}% of Speaking — practise daily`);
+  if (has('describe-image') && (gaps.speaking ?? 1) > 0) add('describe-image', 2, `${exam.weights['describe-image']!.skills.speaking}% of Speaking, practise daily`);
   const rotation = LONG_TASKS.filter(has);
   if (rotation.length > 0) {
     const today = rotation[Math.floor(now / 86400000) % rotation.length];

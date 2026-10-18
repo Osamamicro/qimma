@@ -6,7 +6,7 @@ import { mocksStore } from '@/services/app-state';
 
 export default function MockResultScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const mocks = mocksStore.use();
+  const mocks = mocksStore.useValue();
   const record = mocks.find((m) => m.id === id);
   if (!record) {
     return (
