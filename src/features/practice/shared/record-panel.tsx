@@ -38,6 +38,9 @@ export function RecordPanel({ prepSec, responseSec, mode, ready = true, autoStar
   const [rating, setRating] = useState<number | null>(null);
   const player = useAudioPlayer(response?.audioUri ?? null);
   const stopping = useRef(false);
+  // Automatic start happens once per item. After a failed start (microphone blocked) the
+  // panel stays idle with the error and the Begin button instead of retrying forever.
+  const armed = useRef(false);
 
   const startRecording = async () => {
     stopping.current = false;
@@ -66,10 +69,18 @@ export function RecordPanel({ prepSec, responseSec, mode, ready = true, autoStar
   const rec = useCountdown(responseSec, phase === 'recording', () => void stopRecording());
 
   useEffect(() => {
-    if ((mode === 'mock' || autoStart) && ready && phase === 'idle') setPhase('prep');
+    if (armed.current || !(mode === 'mock' || autoStart) || !ready || phase !== 'idle') return;
+    armed.current = true;
+    setPhase('prep');
   }, [mode, autoStart, ready, phase]);
 
   useEffect(() => () => capture.cancel(), [capture.cancel]);
+
+  /** Mock only: give up on this question. Nothing recorded (durationMs 0) scores 0 out of the full maximum. */
+  const skip = () => {
+    setPhase('done');
+    onComplete({ kind: 'speech', transcript: null, confidence: null, durationMs: 0, audioUri: null });
+  };
 
   const submitRating = () => {
     if (!response) return;
@@ -87,6 +98,7 @@ export function RecordPanel({ prepSec, responseSec, mode, ready = true, autoStar
           </Text>
           {capture.error ? <Text tone="danger">{capture.error}</Text> : null}
           <Button label={ready ? 'Begin' : 'Waiting for audio…'} disabled={!ready} onPress={() => setPhase(prepSec > 1 ? 'prep' : 'recording')} />
+          {mode === 'mock' && capture.error ? <Button label="Skip question" variant="secondary" onPress={skip} /> : null}
           {!capture.recognitionSupported && (
             <Text variant="small" tone="faint">
               Automatic speech scoring runs in the web app on Chrome or Edge. Here you can record, listen back and self-rate.

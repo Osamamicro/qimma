@@ -117,7 +117,11 @@ export function WritingBox({ value, onChange, minWords, maxWords, placeholder, m
   );
 }
 
-/** Standard submit button for renderers; shows "Next" in mock mode. */
+/**
+ * Standard submit button for renderers; shows "Next" in mock mode. `disabled` means the answer is
+ * incomplete; a mock ignores it because the real test lets you move on at any time (a partial or
+ * empty answer is scored as such). `submitted` hides the bar once the answer is locked.
+ */
 export function SubmitBar({
   mode,
   disabled,
@@ -130,5 +134,5 @@ export function SubmitBar({
   submitted?: boolean;
 }) {
   if (submitted) return null;
-  return <Button label={mode === 'mock' ? 'Next →' : 'Submit'} size="lg" disabled={disabled} onPress={onPress} />;
+  return <Button label={mode === 'mock' ? 'Next →' : 'Submit'} size="lg" disabled={mode === 'mock' ? false : disabled} onPress={onPress} />;
 }

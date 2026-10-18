@@ -5,6 +5,7 @@ import {
   daysUntil,
   getExam,
   getTaskType,
+  isCalendarDate,
   minutesPerItem,
   type PlanSettings,
   type PlanTask,
@@ -45,10 +46,22 @@ const settings = (over: Partial<PlanSettings> = {}): PlanSettings => ({
 const minutesOf = (tasks: PlanTask[]) => tasks.reduce((sum, t) => sum + t.count * minutesPerItem(t.taskType), 0);
 const rotationOf = (tasks: PlanTask[]) => tasks.find((t) => t.reason === ROTATION);
 
+describe('isCalendarDate', () => {
+  it('accepts real dates and rejects impossible ones', () => {
+    expect(isCalendarDate('2026-10-20')).toBe(true);
+    expect(isCalendarDate('2028-02-29')).toBe(true);
+    expect(isCalendarDate('2025-02-30')).toBe(false);
+    expect(isCalendarDate('2025-13-45')).toBe(false);
+    expect(isCalendarDate('2025-1-5')).toBe(false);
+    expect(isCalendarDate('')).toBe(false);
+  });
+});
+
 describe('daysUntil', () => {
   it('is null when no exam is booked or the date is invalid', () => {
     expect(daysUntil(null, NOW)).toBeNull();
     expect(daysUntil('not-a-date', NOW)).toBeNull();
+    expect(daysUntil('2025-02-30', NOW)).toBeNull();
   });
 
   it('counts whole days to the exam date', () => {

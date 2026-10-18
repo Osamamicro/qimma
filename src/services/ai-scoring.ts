@@ -94,6 +94,9 @@ async function hostedReply(config: AiScoringConfig, request: ReturnType<typeof a
 /** Scores any response; writing tasks go to the AI scorer when one is configured. */
 export async function scoreResponse(item: Item, response: Response, config = defaultConfig()): Promise<ScoreResult> {
   if (!aiScoringEnabled(config) || !isAiWritingItem(item) || response.kind !== 'text') return scoreItem(item, response);
+  // Form 0 (empty or far off length) zeroes every trait in PTE, so the AI could not change the score.
+  const onDevice = scoreItem(item, response);
+  if (onDevice.traits.find((t) => t.id === 'form')?.score === 0) return onDevice;
 
   const local = Boolean(config.localUrl);
   const controller = new AbortController();
@@ -103,8 +106,7 @@ export async function scoreResponse(item: Item, response: Response, config = def
     const reply = await (local ? localReply : hostedReply)(config, request, controller.signal);
     return mergeAiScore(item, response.text, reply);
   } catch {
-    const fallback = scoreItem(item, response);
-    return { ...fallback, feedback: [FALLBACK_NOTE, ...fallback.feedback] };
+    return { ...onDevice, feedback: [FALLBACK_NOTE, ...onDevice.feedback] };
   } finally {
     clearTimeout(timer);
   }

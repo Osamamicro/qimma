@@ -74,6 +74,15 @@ describe('no transcript (no speech recogniser on the device)', () => {
     expect(r.estimated).toBe(true);
   });
 
+  it('scores 0 out of the full maximum when nothing was recorded (skipped question)', () => {
+    for (const r of [scoreReferenceSpeech('read-aloud', RA_TEXT, speech(null, 0)), scoreShortAnswer(['seven'], speech(null, 0))]) {
+      expect(r.traits.some((t) => t.unscored)).toBe(false);
+      expect(r.total).toBe(0);
+      expect(r.max).toBeGreaterThan(0);
+      expect(r.percent).toBe(0);
+    }
+  });
+
   it('leaves everything unscored when there is no self-rating either', () => {
     const r = scoreReferenceSpeech('read-aloud', RA_TEXT, speech(null, 30000));
     expect(r.traits.every((t) => t.unscored)).toBe(true);

@@ -25,14 +25,14 @@ Australian Home Affairs scale, R69 L70 S88 W85 on PTE Academic.
 | Scoring | Exact PTE rules for objective tasks. Trait-level heuristic estimates for speaking and writing, with a 25% on-topic floor (`src/core/scoring`). |
 | Official data | Pearson weighting (Aug 2025), DHA 2025 targets and test-structure ranges, all in `src/core/exams/`. |
 | Features | Practice player, full/mini/section mocks + report, vocab SRS (SM-2), daily plan, progress, settings, progress backup (JSON export/import with merge, storage-failure banner; ADR-013). |
-| Quality | `tsc` clean, Vitest 259/259, web export OK, 8 Playwright end-to-end flows pass at a 390px viewport. |
+| Quality | `tsc` clean, Vitest 283/283, web export OK; the main flows were checked manually and with headless Playwright during development at a 390px viewport (no e2e specs are committed). |
 | Emulator | `scripts/setup-android-emulator.{ps1,sh}` (one-time setup) + `npm run emulator:android`. |
 
 **Verified on the owner's Windows PC (2026-10-18):** the setup script, the emulator launcher,
 the app in Expo Go (SDK 58) on an Android 36 emulator, Repeat Sentence text-to-speech, and
 microphone recording and playback. iOS and a physical phone are still unverified.
 
-**Last check (2026-10-18, owner's Windows PC):** `npm run check` (tsc clean, 259/259) and the
+**Last check (2026-10-18, owner's Windows PC):** `npm run check` (tsc clean, 283/283) and the
 web build are green. Item 2 (backup) works in the browser (export, import with merge preview,
 storage-failure banner) and in the Android emulator (share-sheet export, file-picker import).
 
@@ -43,7 +43,7 @@ git clone https://github.com/Osamamicro/qimma.git
 cd qimma
 npm install
 npx expo start --web --port 8099   # once, then Ctrl+C: generates .expo/types for typed routes
-npm run check                      # typecheck + 259 tests; must be green before you change anything
+npm run check                      # typecheck + 283 tests; must be green before you change anything
 npm run web                        # Chrome/Edge (speech scoring needs the Web Speech API)
 npm run emulator:android           # after the one-time setup script; see docs/EMULATOR.md
 ```

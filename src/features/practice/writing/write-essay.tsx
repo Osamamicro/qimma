@@ -10,6 +10,7 @@ import { useTimedText } from './use-timed-text';
 /** Write Essay: 200–300 words in the 20-minute response window. */
 export function WriteEssayRenderer({ item, mode, onSubmit, onDraft, result }: RendererProps<WriteEssayItem>) {
   const seconds = getTaskType(item.type).timing.responseSec ?? 1200;
+  const [minWords, maxWords] = getTaskType(item.type).timing.words ?? [200, 300];
   const { text, change, submit, done, timeLeft, timerActive } = useTimedText({
     seconds,
     locked: !!result,
@@ -26,7 +27,7 @@ export function WriteEssayRenderer({ item, mode, onSubmit, onDraft, result }: Re
         ) : null}
       </Row>
       <Passage label="Prompt" text={item.prompt} />
-      <WritingBox value={text} onChange={change} minWords={200} maxWords={300} minHeight={280} disabled={done} />
+      <WritingBox value={text} onChange={change} minWords={minWords} maxWords={maxWords} minHeight={280} disabled={done} />
       <SubmitBar mode={mode} submitted={done} disabled={text.trim() === '' || done} onPress={submit} />
     </View>
   );

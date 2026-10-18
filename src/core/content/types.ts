@@ -277,6 +277,7 @@ export interface SpeechResponse {
   kind: 'speech';
   /** Recognised text, or null when speech recognition is unavailable on this device. */
   transcript: string | null;
+  /** Recording length; 0 means nothing was recorded (skipped), which scores 0 across all traits. */
   durationMs: number;
   /** Mean recogniser confidence 0..1 when the engine reports it. */
   confidence?: number | null;

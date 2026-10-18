@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Alert, Switch, TextInput, View } from 'react-native';
 
 import { Button, Card, Chip, Row, Screen, Text } from '@/components/ui';
-import { EXAM_LIST, SCORE_TARGETS } from '@/core';
+import { EXAM_LIST, isCalendarDate, SCORE_TARGETS } from '@/core';
 import { BackupCard } from '@/features/backup/backup-card';
 import { resetAllData, selectExam, updateSettings, useSettings } from '@/services/app-state';
 import { radius, space, useColors } from '@/theme';
@@ -16,11 +16,12 @@ export default function SettingsScreen() {
   const c = useColors();
   const s = useSettings();
   const [date, setDate] = useState(s.examDate ?? '');
-  const dateValid = date === '' || /^\d{4}-\d{2}-\d{2}$/.test(date);
+  const dateValid = date === '' || isCalendarDate(date);
 
   const save = () => {
     updateSettings({ examDate: date === '' ? null : date, onboarded: true });
     if (router.canGoBack()) router.back();
+    else router.replace('/');
   };
 
   const confirmReset = () => {
@@ -86,13 +87,14 @@ export default function SettingsScreen() {
         <TextInput
           value={date}
           onChangeText={setDate}
+          accessibilityLabel="Exam date, YYYY-MM-DD"
           placeholder="YYYY-MM-DD (leave empty if not booked)"
           placeholderTextColor={c.textFaint}
           autoCapitalize="none"
           inputMode="numeric"
           style={{ color: c.text, borderWidth: 1, borderColor: dateValid ? c.border : c.danger, borderRadius: radius.md, padding: space.md, fontSize: 16 }}
         />
-        {!dateValid && <Text tone="danger">Use the format YYYY-MM-DD.</Text>}
+        {!dateValid && <Text tone="danger">Enter a real date as YYYY-MM-DD.</Text>}
       </Card>
 
       <Card>
@@ -112,7 +114,7 @@ export default function SettingsScreen() {
               Audio plays once, no spellcheck or autocorrect, as on test day.
             </Text>
           </View>
-          <Switch value={s.examMode} onValueChange={(v) => updateSettings({ examMode: v })} />
+          <Switch value={s.examMode} onValueChange={(v) => updateSettings({ examMode: v })} accessibilityLabel="Exam mode" />
         </Row>
       </Card>
 

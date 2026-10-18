@@ -214,7 +214,7 @@ function SectionIntro({ index, total, name, minutes, items, notice, onStart }: S
       ) : null}
       <Card tone="primary">
         <Text variant="caption" tone="muted">
-          SECTION {index + 1} OF {total}
+          Section {index + 1} of {total}
         </Text>
         <Text variant="heading">{name}</Text>
         <Row style={{ alignItems: 'flex-start' }} gap={16}>

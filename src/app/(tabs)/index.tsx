@@ -134,6 +134,9 @@ export default function TodayScreen() {
         {scores}
         {today}
       </View>
+      <Text variant="caption" tone="faint">
+        Qimma is an independent study tool and is not affiliated with or endorsed by Pearson. PTE is a trademark of Pearson.
+      </Text>
     </Screen>
   );
 }

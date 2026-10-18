@@ -13,6 +13,7 @@ import type { RendererProps } from '../types';
  */
 export function SummarizeSpokenTextRenderer({ item, mode, onSubmit, onDraft, result }: RendererProps<SummarizeSpokenTextItem>) {
   const seconds = getTaskType(item.type).timing.responseSec ?? 600;
+  const [minWords, maxWords] = getTaskType(item.type).timing.words ?? [50, 70];
   const [text, setText] = useState('');
   const [listened, setListened] = useState(false);
   const [closed, setClosed] = useState(false);
@@ -56,11 +57,11 @@ export function SummarizeSpokenTextRenderer({ item, mode, onSubmit, onDraft, res
       <WritingBox
         value={text}
         onChange={change}
-        minWords={50}
-        maxWords={70}
+        minWords={minWords}
+        maxWords={maxWords}
         minHeight={160}
         disabled={!!result}
-        placeholder="Write your summary in 50–70 words…"
+        placeholder={`Write your summary in ${minWords}–${maxWords} words…`}
       />
       <SubmitBar mode={mode} submitted={!!result} disabled={text.trim() === ''} onPress={submit} />
     </View>

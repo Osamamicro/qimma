@@ -29,7 +29,7 @@ Run every npm command in `repos\qimma`, which contains `package.json`.
 ```powershell
 npm install
 npx expo start --web --port 8099   # wait for "Waiting on http://localhost:8099", then Ctrl+C
-npm run check                      # expect a clean typecheck and 259 passing tests
+npm run check                      # expect a clean typecheck and 283 passing tests
 ```
 
 ## 3. Backlog item 1: emulator (only this PC can do it)
