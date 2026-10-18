@@ -63,6 +63,7 @@ server STT can be plugged in without touching scorers.
 
 **Open question for the council:** next step for native speech scoring — (a) development build
 with an on-device recogniser module, (b) server STT (e.g. Whisper) behind our API, (c) both.
+Answered by ADR-015: (b), with a local Whisper server first.
 
 ## ADR-005 — Listening audio from on-device text-to-speech
 
@@ -233,3 +234,29 @@ Pages site when Ollama allows that origin). Phones elsewhere fall back to on-dev
 hosted provider is configured. The release gate (calibration on 100+ human-rated responses) still
 applies, per model.
 
+
+## ADR-015 — Phone speech-to-text with local Whisper
+
+**Context.** ADR-004 left phones (Expo Go) on self-review and asked whether native speech scoring
+should use an on-device recogniser in a development build, server STT, or both. The owner has no
+paid APIs. The sister project Mudawwin already runs Whisper locally (Whisper.net,
+`ggml-largev3turbo-q5_0.bin`).
+
+**Decision.** Server STT, local first (option b of ADR-004):
+- `tools/stt-server` is a small .NET 10 server (`qimma-stt`) with the OpenAI-style endpoint
+  `POST /v1/audio/transcriptions` (multipart `file`, optional `language`). It reuses Mudawwin's
+  model and packages, decodes the phone's AAC/M4A with Windows Media Foundation (no FFmpeg),
+  prefers the GPU through Vulkan (3 s for 5 s of speech on the owner's laptop, against 34 s on the
+  CPU) and handles one request at a time. Audio is written to a temp file and deleted before the
+  reply; only timings are logged.
+- The app uploads the recording when `EXPO_PUBLIC_LOCAL_STT_URL` is set and no live recogniser
+  produced a transcript. Any failure (server off, timeout, decode error) falls back to
+  self-review, as before.
+- Transcripts from Whisper are marked `transcriptSource: 'whisper'`. They score **content only**;
+  fluency and pronunciation stay "not scored" on phones until they are calibrated (ADR-004).
+
+**Consequences.** Phones get content scores while the owner's PC runs the server (emulator:
+`http://10.0.2.2:8178`; a phone on the same Wi-Fi: the PC's LAN address, which may need a Windows
+Firewall allow rule for port 8178). Elsewhere they keep self-review. Whisper can invent short
+phrases ("Thank you.") from near-silence; such answers score 0 content, the same as silence.
+Windows only for now; a hosted Whisper behind the same endpoint would need no app change.

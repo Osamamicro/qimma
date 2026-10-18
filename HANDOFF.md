@@ -25,14 +25,15 @@ Australian Home Affairs scale, R69 L70 S88 W85 on PTE Academic.
 | Scoring | Exact PTE rules for objective tasks. Trait-level heuristic estimates for speaking and writing, with a 25% on-topic floor (`src/core/scoring`). |
 | Official data | Pearson weighting (Aug 2025), DHA 2025 targets and test-structure ranges, all in `src/core/exams/`. |
 | Features | Practice player, full/mini/section mocks + report, vocab SRS (SM-2), daily plan, progress, settings, progress backup (JSON export/import with merge, storage-failure banner; ADR-013). |
-| Quality | `tsc` clean, Vitest 284/284, web export OK; the main flows were checked manually and with headless Playwright during development at a 390px viewport (no e2e specs are committed). |
+| Quality | `tsc` clean, Vitest 293/293, web export OK; the main flows were checked manually and with headless Playwright during development at a 390px viewport (no e2e specs are committed). |
 | Emulator | `scripts/setup-android-emulator.{ps1,sh}` (one-time setup) + `npm run emulator:android`. |
+| Phone STT | Optional local Whisper server `tools/stt-server` (ADR-015): speaking tasks on phones get content scores when `EXPO_PUBLIC_LOCAL_STT_URL` is set. |
 
 **Verified on the owner's Windows PC (2026-10-18):** the setup script, the emulator launcher,
 the app in Expo Go (SDK 58) on an Android 36 emulator, Repeat Sentence text-to-speech, and
 microphone recording and playback. iOS and a physical phone are still unverified.
 
-**Last check (2026-10-18, owner's Windows PC):** `npm run check` (tsc clean, 284/284) and the
+**Last check (2026-10-18, owner's Windows PC):** `npm run check` (tsc clean, 293/293) and the
 web build are green. Item 2 (backup) works in the browser (export, import with merge preview,
 storage-failure banner) and in the Android emulator (share-sheet export, file-picker import).
 
@@ -43,7 +44,7 @@ git clone https://github.com/Osamamicro/qimma.git
 cd qimma
 npm install
 npx expo start --web --port 8099   # once, then Ctrl+C: generates .expo/types for typed routes
-npm run check                      # typecheck + 284 tests; must be green before you change anything
+npm run check                      # typecheck + 293 tests; must be green before you change anything
 npm run web                        # Chrome/Edge (speech scoring needs the Web Speech API)
 npm run emulator:android           # after the one-time setup script; see docs/EMULATOR.md
 ```
@@ -105,9 +106,11 @@ Each item lists *done when*.
    ~40 s per essay, verified end to end in the browser). Hosted: Supabase project `qimma`
    (`fsdpabhmcyaaybvrwznm`), function `score-writing` v2 deployed but idle (no `LLM_API_KEY`).
    Remaining: calibrate on 100+ human-rated responses (`npm run calibrate:writing`).
-4. **Speech-to-text for phones (ADR-004).** Upload a recording to the same service, transcribe it
-   transiently (never store audio), then score with the existing speaking scorers. Keep fluency
-   and pronunciation hidden on phones until they are calibrated.
+4. **Speech-to-text for phones (ADR-004, ADR-015). Built 2026-10-19** with a local Whisper server
+   (`tools/stt-server`, .NET 10 + Whisper.net, Vulkan GPU, ~3-5 s per answer), verified end to
+   end in the Android emulator (upload, transcription, content score, fluency and pronunciation
+   "not scored"). Setup: `docs/EMULATOR.md` §2.5. Remaining: a physical phone over Wi-Fi, and
+   calibrating fluency and pronunciation for Whisper transcripts.
 5. **Image-based Describe Image items (ADR-011).** Add figure-and-direction key points: a figure
    only counts when it appears with the right trend word in the same sentence.
 6. **Summarize Group Discussion note grid (ADR-011).** One note column per speaker during the

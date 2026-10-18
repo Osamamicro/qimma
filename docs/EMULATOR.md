@@ -106,10 +106,35 @@ emulator another way (from Android Studio, say), turn it on by hand: **Extended 
 
 When the app first records, allow the microphone when Android asks (*While using the app*).
 
-Note: in Expo Go there is no automatic speech recognition yet. The app scores speaking tasks
-from your self-review, comparing your recording with the model answer. Automatic speech scoring
-on the emulator and phone needs a development build (see `docs/ROADMAP.md`). In the web app,
-browser speech recognition is used where it is available (section 6).
+Expo Go has no speech recogniser of its own. Without the transcription server below, the app
+scores speaking tasks from your self-review, comparing your recording with the model answer. In
+the web app, browser speech recognition is used where it is available (section 6).
+
+### 2.5 Speech-to-text for speaking tasks (optional, ADR-015)
+
+A small local server transcribes your recordings with Whisper, so speaking tasks are scored for
+content on the emulator and on phones. Fluency and pronunciation stay "not scored" there.
+Windows only; needs the .NET 10 SDK and a Whisper ggml model.
+
+1. Model: if the Mudawwin app is installed, its model is used
+   (`%LOCALAPPDATA%\NoteTaker\models\ggml-largev3turbo-q5_0.bin`). Otherwise download a ggml
+   model (for example `ggml-large-v3-turbo-q5_0.bin` from the whisper.cpp models on Hugging Face)
+   and set `QIMMA_WHISPER_MODEL` to its path.
+2. Start the server and keep the window open:
+
+```powershell
+cd tools\stt-server
+dotnet run -c Release
+```
+
+   It prints the model and runtime (`Vulkan` on a GPU, otherwise `Cpu`) and listens on
+   `http://0.0.0.0:8178`. Set `QIMMA_STT_URLS` to change that.
+3. In `.env.local` set `EXPO_PUBLIC_LOCAL_STT_URL=http://10.0.2.2:8178` (the emulator's address
+   for your PC), then restart `npx expo start`.
+
+After recording, speaking tasks show "Transcribing your answer…" and then a content score. If
+the server is off or fails, the app falls back to self-review. Audio is deleted after
+transcription.
 
 ---
 
@@ -180,6 +205,10 @@ npx expo start --tunnel
 ```
 
 Expo may ask you to install `@expo/ngrok` the first time. Answer yes.
+
+For speech-to-text on the phone (section 2.5), set `EXPO_PUBLIC_LOCAL_STT_URL` to your PC's
+Wi-Fi address instead, for example `http://192.168.1.20:8178` (`ipconfig` shows it), and allow
+the server through Windows Firewall when it asks (private networks only).
 
 Keep Expo Go up to date. If Expo Go says the project needs a newer version, update Expo Go
 from the store and scan the code again.
