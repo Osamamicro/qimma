@@ -27,7 +27,7 @@ export default function MockTab() {
   const start = (kind: MockKind) => router.push({ pathname: '/mock/[kind]', params: { kind } });
 
   return (
-    <Screen>
+    <Screen headerless>
       <View style={{ gap: 4 }}>
         <Text variant="title">Mock tests</Text>
         <Text tone="muted">{exam.name} · exam conditions, timed sections and an instant report.</Text>

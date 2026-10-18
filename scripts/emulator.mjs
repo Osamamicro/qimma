@@ -18,7 +18,8 @@ import { fileURLToPath } from 'node:url';
 
 const EXIT = { OK: 0, SETUP: 1, BOOT: 2, EXPO: 3 };
 const DEFAULT_AVD = 'Qimma_Pixel';
-const BOOT_TIMEOUT_MS = 180_000;
+// The first cold boot of a new AVD took about 3.5 minutes on a Windows laptop with WHPX.
+const BOOT_TIMEOUT_MS = 300_000;
 const IS_WINDOWS = process.platform === 'win32';
 const EXE = IS_WINDOWS ? '.exe' : '';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -172,7 +173,9 @@ async function onlineDevices(adb) {
 async function bootEmulator(emulatorBin, adb, avd, cold) {
   const logPath = path.join(os.tmpdir(), 'qimma-emulator.log');
   const log = openSync(logPath, 'w');
-  const args = ['-avd', avd, '-netdelay', 'none', '-netspeed', 'full'];
+  // -allow-host-audio: the host-microphone toggle in Extended controls resets on every boot;
+  // this flag keeps the PC microphone connected so speaking tasks can record.
+  const args = ['-avd', avd, '-netdelay', 'none', '-netspeed', 'full', '-allow-host-audio'];
   if (cold) args.push('-no-snapshot-load');
 
   let spawnError = null;
@@ -216,13 +219,15 @@ async function bootEmulator(emulatorBin, adb, avd, cold) {
 }
 
 /** Runs `npx expo start --android` in the project with the terminal attached, so Expo Go opens automatically. */
-function startExpo() {
+function startExpo(sdk) {
   return new Promise((resolve) => {
     info('Starting Expo for Android (npx expo start --android). Press Ctrl+C to stop.');
     const child = spawn(IS_WINDOWS ? 'npx.cmd' : 'npx', ['expo', 'start', '--android'], {
       cwd: ROOT,
       stdio: 'inherit',
       shell: IS_WINDOWS,
+      // Expo must use the same SDK (adb) that found the device.
+      env: { ...process.env, ANDROID_HOME: sdk },
     });
     child.on('error', (error) => {
       fail(`Could not start npx: ${error.message}`);
@@ -313,7 +318,7 @@ async function main(argv) {
     ok('Done. Start the app with: npx expo start --android');
     return EXIT.OK;
   }
-  const code = await startExpo();
+  const code = await startExpo(sdk);
   return code === 0 ? EXIT.OK : EXIT.EXPO;
 }
 

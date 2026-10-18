@@ -28,8 +28,9 @@ Australian Home Affairs scale, R69 L70 S88 W85 on PTE Academic.
 | Quality | `tsc` clean, Vitest 259/259, web export OK, 8 Playwright end-to-end flows pass at a 390px viewport. |
 | Emulator | `scripts/setup-android-emulator.{ps1,sh}` (one-time setup) + `npm run emulator:android`. |
 
-**Not verified yet:** a real Android emulator boot, the PowerShell script on Windows, and
-microphone/text-to-speech behaviour on a device. The original sandbox had no KVM and no `pwsh`.
+**Verified on the owner's Windows PC (2026-10-18):** the setup script, the emulator launcher,
+the app in Expo Go (SDK 58) on an Android 36 emulator, Repeat Sentence text-to-speech, and
+microphone recording and playback. iOS and a physical phone are still unverified.
 
 **Last check (2026-10-18, owner's Windows PC):** `npm run check` (tsc clean, 259/259) and the
 web build are green. Item 2 (backup) works in the browser (export, import with merge preview,
@@ -95,10 +96,7 @@ Key contracts:
 
 Each item lists *done when*.
 
-1. **Verify on the owner's PC.** Run the Windows setup script and `npm run emulator:android`. Fix
-   what breaks: SDK paths, AVD flags, the Expo Go version. Start with the risk list in
-   `docs/LOCAL-PC.md` §3. *Done when* the app opens in the
-   emulator, a Repeat Sentence item plays audio, and the microphone records.
+1. **Verify on the owner's PC. Done 2026-10-18.** Fixes and results: `docs/LOCAL-PC.md` §3.
 2. **Progress export/import (ADR-006, decided in ADR-013). Done 2026-10-18,** verified on the web
    and in the Android emulator (share sheet export, file-picker import with merge preview). Code:
    `src/core/backup/`, `src/services/backup-file{,.web}.ts`, `src/features/backup/`.

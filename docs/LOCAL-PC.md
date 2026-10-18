@@ -49,22 +49,24 @@ Then, on the emulator:
 3. Record an answer and play it back.
 
 *Done when* the app opens in Expo Go, Repeat Sentence plays its audio, and the microphone
-records. Afterwards, update HANDOFF §2 (remove "Not verified yet") and add anything new to the
-troubleshooting table in `docs/EMULATOR.md`.
+records. **Done on 2026-10-18.** Two bugs not on the list were also fixed: licences piped from PowerShell
+never reached sdkmanager (now fed through `cmd` redirection), and `Invoke-Streamed` returned the
+tool output with the exit code, so a good install was reported as a failure. The first cold boot
+took about 3.5 minutes, so the boot timeout is now 5 minutes.
 
 ### Check these first
 
-These came from reading the scripts. **None of them has been confirmed on Windows yet.**
+These came from reading the scripts. **Checked on the owner's PC on 2026-10-18** (Windows 11, WHPX, 16 GB): the result is in the last column.
 
-| # | Risk | What you would see | Likely fix |
-| --- | --- | --- | --- |
-| 1 | A fresh Android Studio install sets neither `JAVA_HOME` nor `PATH` for Java | Setup stops at "Java 17 or newer is needed" | Quick: `$env:JAVA_HOME = 'C:\Program Files\Android\Android Studio\jbr'`, then run again. Lasting: make `Get-JavaMajor` in `setup-android-emulator.ps1` detect that folder and set `$env:JAVA_HOME` for the session, because `sdkmanager.bat` needs it too |
-| 2 | The command-line tools are in `cmdline-tools\<version>\bin`, not `latest` | "Command-line tools are missing" | Fall back to the newest `cmdline-tools\*\bin\sdkmanager.bat` |
-| 3 | The emulator's host-microphone toggle resets on every boot | Recordings are silent after a restart | Check whether `emulator -help-all` lists `-allow-host-audio`. If it does, add it to the args in `bootEmulator` (`scripts/emulator.mjs`) |
-| 4 | Command-line AVDs default to `hw.keyboard=no` | You cannot type essays with the PC keyboard | Set `hw.keyboard=yes` in `%USERPROFILE%\.android\avd\Qimma_Pixel.avd\config.ini`, and make the setup script write it |
-| 5 | A detached `emulator.exe` opens a blank console window | An extra empty window appears | Add `windowsHide: true` to the `spawn` options in `bootEmulator` |
-| 6 | The first `adb devices` call can hang while adb starts its server | The launcher waits a long time on its first run | Run `adb start-server` once with `stdio: 'ignore'` before polling |
-| 7 | Expo uses a different SDK than the launcher found | Expo cannot find the device | Pass `env: { ...process.env, ANDROID_HOME: sdk }` to the Expo child in `startExpo` |
+| # | Risk | What you would see | Likely fix | Result (2026-10-18) |
+| --- | --- | --- | --- | --- |
+| 1 | A fresh Android Studio install sets neither `JAVA_HOME` nor `PATH` for Java | Setup stops at "Java 17 or newer is needed" | Quick: `$env:JAVA_HOME = 'C:\Program Files\Android\Android Studio\jbr'`, then run again. Lasting: make `Get-JavaMajor` in `setup-android-emulator.ps1` detect that folder and set `$env:JAVA_HOME` for the session, because `sdkmanager.bat` needs it too | Confirmed. Fixed: the script now uses Android Studio's JBR and sets `JAVA_HOME` for the session. |
+| 2 | The command-line tools are in `cmdline-tools\<version>\bin`, not `latest` | "Command-line tools are missing" | Fall back to the newest `cmdline-tools\*\bin\sdkmanager.bat` | Not hit: the zip unpacked into `cmdline-tools\latest`. |
+| 3 | The emulator's host-microphone toggle resets on every boot | Recordings are silent after a restart | Check whether `emulator -help-all` lists `-allow-host-audio`. If it does, add it to the args in `bootEmulator` (`scripts/emulator.mjs`) | Confirmed: `-allow-host-audio` exists. Added to the launcher; recording works. |
+| 4 | Command-line AVDs default to `hw.keyboard=no` | You cannot type essays with the PC keyboard | Set `hw.keyboard=yes` in `%USERPROFILE%\.android\avd\Qimma_Pixel.avd\config.ini`, and make the setup script write it | Confirmed (`hw.keyboard=no`). The setup script now writes `hw.keyboard=yes`. |
+| 5 | A detached `emulator.exe` opens a blank console window | An extra empty window appears | Add `windowsHide: true` to the `spawn` options in `bootEmulator` | Not observed. Left as is; `windowsHide` could also hide the emulator window. |
+| 6 | The first `adb devices` call can hang while adb starts its server | The launcher waits a long time on its first run | Run `adb start-server` once with `stdio: 'ignore'` before polling | Not observed. |
+| 7 | Expo uses a different SDK than the launcher found | Expo cannot find the device | Pass `env: { ...process.env, ANDROID_HOME: sdk }` to the Expo child in `startExpo` | Fixed preventively: the launcher passes `ANDROID_HOME` to Expo. |
 
 **Corporate PC notes:**
 

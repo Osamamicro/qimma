@@ -53,7 +53,7 @@ export default function ProgressTab() {
   const goal = preset ? `Goal: ${preset.name}` : `Goal: ${settings.targetScore} in each skill`;
 
   return (
-    <Screen>
+    <Screen headerless>
       <View style={{ gap: 4 }}>
         <Text variant="title">Progress</Text>
         <Text tone="muted">Estimates from your recent answers. They sharpen as you practise more task types.</Text>

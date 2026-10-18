@@ -35,7 +35,7 @@ export default function VocabTab() {
   };
 
   return (
-    <Screen>
+    <Screen headerless>
       <View style={{ gap: 4 }}>
         <Text variant="title">Vocabulary</Text>
         <Text tone="muted">Your word book. Words come back on a spaced schedule so you remember them longer.</Text>

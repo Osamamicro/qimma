@@ -61,14 +61,15 @@ powershell -ExecutionPolicy Bypass -File scripts\setup-android-emulator.ps1
 
 The script:
 
-1. checks **Java 17+** (Android Studio's own Java works: set `JAVA_HOME` to
-   `C:\Program Files\Android\Android Studio\jbr`);
+1. checks **Java 17+**. With no `JAVA_HOME` and no `java` on `PATH`, it uses the JDK bundled
+   with Android Studio (`C:\Program Files\Android\Android Studio\jbr`) for the session;
 2. finds the Android SDK (`ANDROID_HOME`, `ANDROID_SDK_ROOT`, or `%LOCALAPPDATA%\Android\Sdk`);
 3. checks the **command-line tools**. If they are missing, it tells you exactly what to tick in
    Android Studio and stops;
 4. installs `platform-tools`, `emulator`, `platforms;android-36` and a Google APIs system image
    (about 1.5 GB), and accepts the licences;
-5. creates the virtual device **Qimma_Pixel**.
+5. creates the virtual device **Qimma_Pixel** and turns on the PC keyboard for it
+   (`hw.keyboard=yes`), so you can type essays.
 
 It is safe to run again. Packages that are already installed are skipped.
 
@@ -80,7 +81,7 @@ To see the options: `powershell -ExecutionPolicy Bypass -File scripts\setup-andr
 npm run emulator:android
 ```
 
-This starts the emulator if it is not running, waits for Android to boot (up to 3 minutes),
+This starts the emulator if it is not running, waits for Android to boot (up to 5 minutes; the first boot of a new device took about 3.5),
 then runs `npx expo start --android`. On the first run Expo installs **Expo Go** on the emulator
 and opens it. Leave the terminal open; press **Ctrl+C** to stop Metro.
 
@@ -98,14 +99,12 @@ The emulator keeps running after you press Ctrl+C. Close its window, or run
 
 ### 2.4 Microphone in the emulator
 
-Speaking tasks record your answer so you can play it back. Let the emulator use your PC's
-microphone:
+Speaking tasks record your answer so you can play it back. The launcher starts the emulator
+with `-allow-host-audio`, so it uses your PC's microphone on every boot. If you start the
+emulator another way (from Android Studio, say), turn it on by hand: **Extended controls** (the
+`...` button) > **Microphone** > **Virtual microphone uses host audio input**.
 
-1. In the emulator, open **Extended controls** (the `...` button in the side bar).
-2. Choose **Microphone**.
-3. Turn on **Virtual microphone uses host audio input**.
-
-When the app first records, allow the microphone when Android asks.
+When the app first records, allow the microphone when Android asks (*While using the app*).
 
 Note: in Expo Go there is no automatic speech recognition yet. The app scores speaking tasks
 from your self-review, comparing your recording with the model answer. Automatic speech scoring
@@ -209,7 +208,7 @@ Allow the microphone when the browser asks.
 | `Android SDK not found` | Android Studio has not installed the SDK yet, or it is in an unusual folder | Open Android Studio once. Or set `ANDROID_HOME` to the SDK folder (for example `C:\Users\you\AppData\Local\Android\Sdk`) and open a new terminal. |
 | `adb` not found, or `Emulator not found` | The SDK packages are missing | Run the setup script again. Or add `%LOCALAPPDATA%\Android\Sdk\platform-tools` to `PATH` and tick *Android Emulator* in SDK Manager. |
 | `Command-line tools are missing` | Android Studio did not install the command-line tools | In Android Studio: Settings > Languages & Frameworks > Android SDK > SDK Tools > tick **Android SDK Command-line Tools (latest)** > Apply. Then run the script again. |
-| `Java 17 or newer is needed` | Java 8 or 11 is first on `PATH` | Set `JAVA_HOME` to Android Studio's JBR (`C:\Program Files\Android\Android Studio\jbr`) or install JDK 17. |
+| `Java 17 or newer is needed` | Java 8 or 11 is first on `PATH` (a missing Java is now found in Android Studio automatically) | Set `JAVA_HOME` to Android Studio's JBR (`C:\Program Files\Android\Android Studio\jbr`) or install JDK 17. |
 | Emulator very slow, or `HAXM` / `WHPX` / `accel` errors | Hardware acceleration is off or the wrong driver is in use | Turn on **Windows Hypervisor Platform** and restart (section 1). Do not use HAXM. Check the log printed by the launcher. |
 | `Waiting for Android to boot` for minutes, then "did not finish booting" | First boot is slow, or the emulator is stuck | Try `npm run emulator:android -- --cold`. If it still fails, open Device Manager in Android Studio, edit Qimma_Pixel, raise **RAM** to 4096 MB and set **Graphics** to *Software - GLES 2.0*. |
 | Emulator stops at once | Missing or broken system image, or a driver problem | Read the log: `%TEMP%\qimma-emulator.log` (Windows) or `/tmp/qimma-emulator.log` (macOS and Linux). |
@@ -217,7 +216,10 @@ Allow the microphone when the browser asks.
 | `Port 8081 is already in use` | Another Metro or Expo server is running | Close the other terminal, or run `npx expo start --android --port 8090`. |
 | Phone or browser cannot connect to the dev server | Windows Firewall blocks Node.js on the private network | Allow **Node.js** when Windows asks, for private networks. Or use `npx expo start --tunnel` (section 5). |
 | Expo says it cannot find an emulator device | The emulator booted but adb does not see it yet | Run `npm run emulator:android` again. If the emulator window is open, wait for the home screen first. |
-| Playing back a speaking answer is silent | Virtual microphone is off | Extended controls > Microphone > *Virtual microphone uses host audio input* (section 2.4). |
+| Playing back a speaking answer is silent | Virtual microphone is off (emulator not started by the launcher) | Extended controls > Microphone > *Virtual microphone uses host audio input* (section 2.4). |
+| "System UI isn't responding" on the first boot | Android is still busy after a cold boot | Tap **Wait**. It does not come back once the device has settled. |
+| `The SDK licences were not accepted` | sdkmanager did not get the answers | Run the command the script prints and answer `y` to each prompt, then run the script again. |
+| SDK installed, but the launcher says `Android SDK not found` | The SDK is in a non-default folder (for example `C:\Users\you\Android\Sdk`) | Set `ANDROID_HOME` for your user: `[Environment]::SetEnvironmentVariable('ANDROID_HOME', 'C:\Users\you\Android\Sdk', 'User')`, then open a new terminal. |
 | Speaking tasks ask you to self-rate, not a transcript | Expo Go has no speech recognition (expected) | Normal on the emulator and phone. Use the web app in Chrome or Edge for automatic speech scoring (section 6). |
 | Setup script says `execution of scripts is disabled` | PowerShell policy blocks scripts | Always start it with `powershell -ExecutionPolicy Bypass -File scripts\setup-android-emulator.ps1` as shown above. |
 
@@ -227,7 +229,7 @@ Allow the microphone when the browser asks.
 |---|---|
 | 0 | Done: Expo exited cleanly, or `--no-start` booted the emulator |
 | 1 | Setup problem: Node older than 20, SDK / emulator / adb / AVD not found, bad option |
-| 2 | The emulator did not finish booting within 3 minutes, or it stopped (see the log) |
+| 2 | The emulator did not finish booting within 5 minutes, or it stopped (see the log) |
 | 3 | Expo exited with an error |
 
 ---
