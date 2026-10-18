@@ -88,3 +88,19 @@ Author: council-engineering. Inputs: docs/DECISIONS.md, FEATURE-MAP.md, ROADMAP.
 - `"lint": "expo lint"` has no ESLint config in the repo, so it will prompt for setup. Fix: run the setup once and commit the config.
 - `README.md` is still the create-expo-app template and mentions `npm run reset-project`, which does not exist.
 - `app.json` has no `experiments.baseUrl` (see D4).
+
+
+---
+
+## Round 2 (2026-10-18): export/import (ADR-013)
+
+**Q1 Import semantics: merge (high).** It is idempotent and never discards newer local
+progress. On an empty device it equals replace. Union by id plus last-review-wins is what
+v0.3 sync needs anyway. *Risk:* settings carry no timestamp, so the file's settings overwrite
+the current ones. *Mitigation:* show a preview before committing.
+
+**Q2 Storage warning: both reactive and threshold (medium).** Today `write()` updates the cache,
+then swallows the `setItem` error, so the learner loses data on reload. The native polyfill may
+never throw `QuotaExceededError`, so only a size check gives every platform the same
+behaviour. *Risk:* any fixed threshold is a guess. *Mitigation:* make it a named constant and
+show an "Export now" action.

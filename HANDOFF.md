@@ -31,9 +31,9 @@ Australian Home Affairs scale, R69 L70 S88 W85 on PTE Academic.
 **Not verified yet:** a real Android emulator boot, the PowerShell script on Windows, and
 microphone/text-to-speech behaviour on a device. The original sandbox had no KVM and no `pwsh`.
 
-**Last check (2026-10-18, cloud):** `npm install`, typed routes and `npm run check` (tsc clean,
-237/237) are green; no code changed. The next session runs on the owner's Windows PC: follow
-`docs/LOCAL-PC.md` (setup, emulator risk list, export/import design, scoring prerequisites).
+**Last check (2026-10-18, cloud, in `Osamamicro/qimma`):** `npm ci`, typed routes and
+`npm run check` (tsc clean, 237/237) are green. No app code changed. Item 1 needs the owner's
+PC (`docs/LOCAL-PC.md`). Item 2 is designed and decided (ADR-013) but has no code yet.
 
 ## 3. First 10 minutes
 
@@ -51,7 +51,7 @@ npm run emulator:android           # after the one-time setup script; see docs/E
 
 1. `docs/team/BRIEF.md` — the contracts and rules every contributor follows.
 2. `docs/ARCHITECTURE.md` — layers, the renderer contract, data flow.
-3. `docs/DECISIONS.md` — ADR-001…012 and the council outcomes. Do not re-open settled decisions
+3. `docs/DECISIONS.md` — ADR-001…013 and the council outcomes. Do not re-open settled decisions
    without new information.
 4. `docs/SCORING.md`, `docs/FEATURE-MAP.md`, `docs/ROADMAP.md`, `docs/EMULATOR.md`.
 
@@ -99,7 +99,7 @@ Each item lists *done when*.
    what breaks: SDK paths, AVD flags, the Expo Go version. Start with the risk list in
    `docs/LOCAL-PC.md` §3. *Done when* the app opens in the
    emulator, a Repeat Sentence item plays audio, and the microphone records.
-2. **Progress export/import (ADR-006).** Proposed design: `docs/LOCAL-PC.md` §4. Add a JSON export/import of settings, attempts, SRS and
+2. **Progress export/import (ADR-006, decided in ADR-013).** Build plan: `docs/LOCAL-PC.md` §4. Add a JSON export/import of settings, attempts, SRS and
    mocks in Settings, with a schema `version` field and a storage-full warning. *Done when* a
    round-trip test passes and the UI works on web and in the emulator.
 3. **AI scoring service, writing first (ADR-008).** A Supabase Edge Function (TypeScript) that

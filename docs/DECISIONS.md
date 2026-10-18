@@ -161,3 +161,43 @@ root, the agent team in `.claude/agents/` and the skills in `.claude/skills/`. T
 deploys to GitHub Pages at `https://osamamicro.github.io/qimma/` through
 `.github/workflows/pages.yml`: `EXPO_BASE_URL=/qimma` via `app.config.js`, with `404.html` as
 the SPA fallback. `.github/workflows/ci.yml` gates PRs with typecheck, tests and the web build.
+
+
+## ADR-013 — Progress export/import: merge on import, visible storage failures
+
+**Context.** ADR-006 puts a JSON export/import in v0.2 as cover for device loss and for moving
+between devices (web at work, phone at home) until v0.3 sync. Two questions were open. What
+does import do with existing local data? How does the app warn when storage is full?
+Council input: `docs/council/*.md`, round 2.
+
+**Decision.**
+- **Import merges, after a preview.**
+  - Attempts and mocks are unioned by `id`, sorted newest first, and capped at 2,000 attempts
+    and 50 mocks.
+  - For each SRS word, the card reviewed most recently wins. No new field is needed: the
+    last-review time is `due - interval * DAY`, because `review()` sets
+    `due = now + interval * DAY`.
+  - Bookmarks are unioned. Settings are taken from the file.
+  - Before anything is written, the learner sees "+N attempts, +N mocks, N cards updated,
+    settings replaced" and confirms. Both council members chose merge, because on a fresh
+    device it gives the same result as replace and it never erases another device's work.
+- **Storage failures are made visible; there is no size threshold.**
+  - `write()` in `src/services/storage.ts` keeps the value in memory, so export still
+    captures it, and sets a persistent "not saved" flag.
+  - A banner on every screen offers "Export now".
+  - Settings shows the backup size and "Last backup: date or never".
+  - Engineering preferred adding a proactive size threshold. Pedagogy argued that a guessed
+    threshold makes false alarms, and that the native expo-sqlite store has no small quota.
+    The orchestrator sided with pedagogy.
+- **Files rather than share text.** On native, the export is written as a file and shared,
+  and import uses a document picker. A share-sheet text message can exceed Android's ~1 MB
+  intent limit once 50 mock reports are stored. `expo-file-system`, `expo-sharing` and
+  `expo-document-picker` are all "Included in Expo Go" per the SDK 58 docs, so no development
+  build is needed. The web uses a Blob download and a file input.
+- **Format.** `{ app: 'qimma', version: 1, exportedAt, data: { settings, attempts, vocab,
+  bookmarks, mocks } }`. Newer versions are rejected, older ones migrated, and malformed
+  entries dropped and counted.
+
+**Consequences.** The merge rules are a pure function in `src/core`, unit-tested now and
+reused by v0.3 sync. Bookmarks removed on one device can come back after a merge, which is
+accepted.
