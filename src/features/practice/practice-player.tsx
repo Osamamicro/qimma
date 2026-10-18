@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { Chip, Row, Text } from '@/components/ui';
-import { getTaskType, scoreItem, type Item, type Response, type ScoreResult } from '@/core';
+import { getTaskType, type Item, type Response, type ScoreResult } from '@/core';
+import { scoreResponse } from '@/services/ai-scoring';
 import { recordAttempt } from '@/services/app-state';
 
 import { rendererFor } from './renderers';
@@ -14,10 +15,14 @@ export function PracticePlayer({ item, onNext }: { item: Item; onNext?: () => vo
   const Renderer = rendererFor(item);
   const [round, setRound] = useState(0);
   const [result, setResult] = useState<ScoreResult | null>(null);
+  const [scoring, setScoring] = useState(false);
 
-  const submit = (response: Response) => {
-    const r = scoreItem(item, response);
+  // Writing tasks may go to the AI service (ADR-008); everything else resolves at once on-device.
+  const submit = async (response: Response) => {
+    setScoring(true);
+    const r = await scoreResponse(item, response);
     recordAttempt(item, response, r);
+    setScoring(false);
     setResult(r);
   };
 
@@ -33,6 +38,11 @@ export function PracticePlayer({ item, onNext }: { item: Item; onNext?: () => vo
         <Text tone="muted">{spec.instructions}</Text>
       </View>
       <Renderer key={`${item.id}-${round}`} item={item} mode="practice" onSubmit={submit} result={result} />
+      {scoring && (
+        <Text tone="muted" accessibilityLiveRegion="polite">
+          Scoring your answer…
+        </Text>
+      )}
       {result && (
         <ScoreCard
           result={result}

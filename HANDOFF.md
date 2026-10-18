@@ -100,13 +100,11 @@ Each item lists *done when*.
 2. **Progress export/import (ADR-006, decided in ADR-013). Done 2026-10-18,** verified on the web
    and in the Android emulator (share sheet export, file-picker import with merge preview). Code:
    `src/core/backup/`, `src/services/backup-file{,.web}.ts`, `src/features/backup/`.
-3. **AI scoring service, writing first (ADR-008).** A Supabase Edge Function (TypeScript) that
-   takes `{ item, response }` and returns `ScoreResult`, grading against the trait rubric with
-   a pinned Claude model. Keys live only in function secrets, never in `EXPO_PUBLIC_*`. The app
-   calls it only when `EXPO_PUBLIC_SCORING_API_URL` is set. Fall back to on-device scoring on
-   timeout, offline or a non-2xx reply. Load the `claude-api` skill before writing the model
-   call. *Done when* SWT, essay, SST and email use it end-to-end, the fallback is tested, and
-   there is a calibration script for at least 100 human-rated responses.
+3. **AI scoring, writing first (ADR-008, ADR-014). Built 2026-10-18; release gate open.** Open-weight
+   models only. Local: set `EXPO_PUBLIC_LOCAL_LLM_URL=http://localhost:11434` (Ollama, `qwen3:8b`,
+   ~40 s per essay, verified end to end in the browser). Hosted: Supabase project `qimma`
+   (`fsdpabhmcyaaybvrwznm`), function `score-writing` v2 deployed but idle (no `LLM_API_KEY`).
+   Remaining: calibrate on 100+ human-rated responses (`npm run calibrate:writing`).
 4. **Speech-to-text for phones (ADR-004).** Upload a recording to the same service, transcribe it
    transiently (never store audio), then score with the existing speaking scorers. Keep fluency
    and pronunciation hidden on phones until they are calibrated.
@@ -124,7 +122,7 @@ Each item lists *done when*.
 
 - **GitHub Pages source.** In the repo's Settings → Pages, choose **GitHub Actions** once,
   or the deploy job cannot publish.
-- **AI services.** Supabase project and Anthropic API key for the scoring service (v0.2 item 3).
+- **AI services.** Hosted scoring needs an open-model provider key (`LLM_API_KEY` secret); local Ollama needs none. The unused `ANTHROPIC_API_KEY` secret can be deleted.
 
 ## 8. Gotchas
 

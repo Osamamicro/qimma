@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.3.0",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "vitest": "^3.2.7"
   },
@@ -51,7 +52,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "expo lint",
     "check": "npm run typecheck && npm test",
-    "emulator:android": "node scripts/emulator.mjs"
+    "emulator:android": "node scripts/emulator.mjs",
+    "calibrate:writing": "tsx scripts/calibrate-writing.ts"
   },
   "private": true
 }

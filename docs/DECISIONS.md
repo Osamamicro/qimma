@@ -202,3 +202,34 @@ Council input: `docs/council/*.md`, round 2.
 **Consequences.** The merge rules are a pure function in `src/core`, unit-tested now and
 reused by v0.3 sync. Bookmarks removed on one device can come back after a merge, which is
 accepted.
+
+### ADR-008 — build notes (2026-10-18)
+
+Built writing-first as decided, first against a Claude model. ADR-014 replaced the model with
+open-weight ones before release. The function scores only the
+judgement traits. The app applies Form, the PTE gating and the trait maxima, so exam facts stay in
+`src/core/exams`. The client timeout is 20 s rather than the council's 8 s, because an essay graded
+with model reasoning takes longer. Mock tests keep on-device scoring for now. Known ceiling: the
+endpoint is protected only by the public publishable key plus input-size caps, until v0.3 adds
+anonymous auth and per-user rate limits.
+
+## ADR-014 — AI scoring uses open-weight models, local first
+
+**Context.** The owner has no paid model API and prefers open-source models; the sister project
+Mudawwin already runs Ollama locally (`qwen3:8b`, `qwen3.5:4b`).
+
+**Decision.**
+- **Local first.** With `EXPO_PUBLIC_LOCAL_LLM_URL` set, the app calls an Ollama server directly
+  (`/api/chat`, `think: false`, JSON-schema `format`, temperature 0). Default model `qwen3:8b`.
+  Thinking is off because it quadrupled latency (153 s vs 35 s on the owner's laptop) without
+  better scores.
+- **Hosted, optional.** The `score-writing` Edge Function speaks the OpenAI-compatible
+  chat-completions API (JSON mode), so any open-model provider or a self-hosted vLLM works by
+  changing secrets. Default `openai/gpt-oss-120b` on Groq; idle until a key is set.
+- The rubric prompt, reply format and validation live once in `rubric.ts` and are used by both.
+
+**Consequences.** Local scoring only works where Ollama runs (the owner's PC, its emulator, or the
+Pages site when Ollama allows that origin). Phones elsewhere fall back to on-device scoring until a
+hosted provider is configured. The release gate (calibration on 100+ human-rated responses) still
+applies, per model.
+
