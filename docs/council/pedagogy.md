@@ -73,3 +73,20 @@ Read: DECISIONS, FEATURE-MAP, SCORING, ROADMAP, `pte.ts`, `study-plan.ts`, `spea
 
 - Spelling is list-based (SCORING.md), so most text earns 2/2. Grammar uses issues per 100 words, so one slip zeroes a 40-word SWT's grammar but leaves a 250-word essay at 1.
 - Check `splitSentences` in `text.ts` (unread). If it splits on every full stop, a valid one-sentence SWT containing "3.5%" or "U.S." fails Form and zeroes the task.
+
+
+---
+
+## Round 2 (2026-10-18): export/import (ADR-013)
+
+**Q1 Import semantics: merge (high).** Replace would erase the other device's work since the
+last export, while attempts and mocks (unique ids, append-only) union without loss. Option (c)
+gives the learner a destructive choice they cannot judge. *Risk:* removed bookmarks can come
+back. *Mitigation:* a preview (+N attempts, +N mocks, N cards updated) and caps reapplied
+newest first. SRS needs no new field, since `due - interval * DAY` is the last review time.
+
+**Q2 Storage warning: reactive, made visible (medium).** The failure is silent today. A
+persistent warning on the first failed write lets the learner export what is still in memory.
+A proactive threshold is a guess and would raise false alarms. *Risk:* learners who never hit
+the limit are never prompted to back up. *Mitigation:* show "Last backup: date or never" and a
+banner on every screen, not only in Settings.

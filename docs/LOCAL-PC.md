@@ -77,32 +77,55 @@ These came from reading the scripts. **None of them has been confirmed on Window
   repo to a short path such as `C:\dev\qimma`. A synced Desktop can make `npm install` fail
   with `EPERM`.
 
-## 4. Backlog item 2: progress export/import (ADR-006), proposed design (not started)
+## 4. Backlog item 2: progress export/import, decided in ADR-013 (not started)
 
 - **Pure core** (new `src/core/backup/`):
-  - Constants and shape: `BACKUP_VERSION = 1` and
-    `{ app: 'qimma', version, exportedAt, data: { settings, attempts, vocab, bookmarks, mocks } }`.
+  - The format is `{ app: 'qimma', version: 1, exportedAt, data: { settings, attempts, vocab,
+    bookmarks, mocks } }`.
   - `createBackup(data, now)` builds the file.
-  - `parseBackup(text)` returns `{ ok: true, data }` or `{ ok: false, error }`. It rejects
-    corrupt JSON, other apps and newer versions, migrates older versions, and drops malformed
-    entries.
-  - Types: move the `Settings`, `Attempt` and `MockRecord` interfaces from
-    `src/services/app-state.ts` into core and re-export them from app-state. Core must not
-    import from services.
-- **Test**: a Vitest round trip, where `parseBackup(JSON.stringify(createBackup(x)))` equals
-  `x`, plus cases for a wrong version, a wrong app and corrupt JSON.
-- **Storage-full warning**: `write()` in `src/services/storage.ts` currently swallows
-  `setItem` errors without a trace. Expose a storage-status store. Settings then shows "Storage
-  is full: export a backup", and import reports a failed write. Optionally show the backup
-  size.
-- **UI** (`src/app/settings.tsx`):
-  - *Export progress*: on the web, download a Blob as `qimma-backup-YYYY-MM-DD.json`. On
-    native, use `Share.share` from react-native, which needs no new native module and keeps
-    Expo Go working.
-  - *Import progress*: a paste box that works everywhere, plus a web file input in a
-    `.web.tsx` file. Confirm before overwriting.
-  - Read the SDK 58 docs before adding `expo-document-picker` or `expo-sharing`.
-- *Done when* the round-trip test passes and the feature works on the web and in the emulator.
+  - `parseBackup(text)` returns `{ ok: true, data, skipped }` or
+    `{ ok: false, error: 'not-json' | 'not-qimma' | 'newer-version' | 'bad-shape' }`.
+  - `mergeBackup(local, incoming)` implements the ADR-013 rules: union by id, newest first,
+    caps of 2,000 attempts and 50 mocks, and the SRS card with the later `due - interval * DAY`.
+  - `backupFileName(now)` returns `qimma-backup-YYYY-MM-DD.json`.
+  - Add `reviewedAt(card)` to `src/core/srs/sm2.ts`.
+  - Move `Settings`, `DEFAULT_SETTINGS`, `Attempt`, `MockRecord` and the two caps from
+    `src/services/app-state.ts` into core, and re-export them from app-state, because core
+    must not import services. Validate task and exam ids against `src/core/exams/`.
+- **Tests (Vitest):**
+  - A round trip: `parseBackup(JSON.stringify(createBackup(x)))` returns `x`.
+  - Error cases: wrong app, newer version, corrupt JSON, and malformed entries dropped and
+    counted.
+  - Merge cases: idempotent (merging the same file twice), caps applied, SRS last-review
+    wins, bookmarks unioned.
+- **Storage** (`src/services/storage.ts`):
+  - `write()` returns `false` on failure, keeps the in-memory value, and sets a
+    `storageStatus` flag (in memory, not persisted).
+  - Add a `storageUsage()` helper that returns the serialized length of the `qimma:` keys.
+  - Store `lastBackupAt` in settings or its own key.
+- **App state** (`src/services/app-state.ts`): add `exportBackup()` and `importBackup(data)`,
+  which merges, writes every store and returns whether all the writes succeeded.
+- **Files:**
+  - Install with `npx expo install expo-file-system expo-sharing expo-document-picker`. All
+    three are in Expo Go per the SDK 58 docs.
+  - Native code goes in `src/services/backup-file.ts`: write to `Paths.cache` with `File`,
+    then `Sharing.shareAsync(uri, { mimeType: 'application/json' })`. Import uses
+    `DocumentPicker.getDocumentAsync`, then `new File(uri).text()`.
+  - Web code goes in `src/services/backup-file.web.ts`: a Blob plus an anchor download, and a
+    hidden `<input type=file>`.
+  - Check the exact APIs on docs.expo.dev/versions/v58.0.0/sdk/{filesystem,sharing,document-picker}.
+- **UI:**
+  - A backup card in Settings: Export, Import (preview, then confirm), "Last backup: date or
+    never", and the size.
+  - A "Progress not saved: export now" banner on every screen while `storageStatus` reports
+    a failure. Put it in the root layout.
+  - Delegate the card and the banner to an `implementer`, with file ownership given in the
+    assignment.
+- *Done when:*
+  - the tests pass;
+  - `npm run check` and `npm run build:web` are green;
+  - there are screenshots at 390px and 1280px;
+  - the feature works on the web and in the emulator.
 
 ## 5. Backlog item 3: AI scoring, writing first (ADR-008). The owner decides first
 
