@@ -19,8 +19,14 @@ function TabButton({ label, isFocused, compact, ...props }: Omit<TabTriggerSlotP
   return (
     <Pressable
       {...props}
-      style={{ paddingVertical: 6, paddingHorizontal: compact ? 8 : 12, borderRadius: radius.md, backgroundColor: isFocused ? c.primarySoft : 'transparent' }}>
-      <Text variant="small" style={{ color: isFocused ? c.primary : c.textMuted, fontWeight: '600' }}>
+      style={{
+        paddingTop: 8,
+        paddingBottom: 6,
+        paddingHorizontal: compact ? 6 : 10,
+        borderBottomWidth: 2,
+        borderBottomColor: isFocused ? c.primary : 'transparent',
+      }}>
+      <Text variant="small" style={{ color: isFocused ? c.text : c.textMuted, fontWeight: isFocused ? '600' : '500' }}>
         {label}
       </Text>
     </Pressable>
@@ -44,10 +50,11 @@ export default function AppTabs() {
             alignItems: compact ? 'stretch' : 'center',
             gap: compact ? space.xs : space.sm,
             paddingHorizontal: compact ? space.sm : space.lg,
-            paddingVertical: space.sm,
+            paddingTop: space.sm,
+            paddingBottom: 0,
           }}>
           <Link href="/" style={{ marginRight: compact ? undefined : 'auto', paddingHorizontal: compact ? space.sm : 0 }}>
-            <Text variant="subheading" style={{ color: c.primary }}>
+            <Text variant="subheading" style={{ color: c.text, letterSpacing: -0.2 }}>
               Qimma
             </Text>
           </Link>

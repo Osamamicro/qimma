@@ -89,7 +89,11 @@ export interface Store<T> {
   /** Returns false when the value could not be persisted (it is still kept in memory). */
   set: (value: T) => boolean;
   update: (fn: (prev: T) => T) => boolean;
-  use: () => T;
+  /**
+   * React hook for the current value. Not named `use`: the React Compiler treats `use()` calls like
+   * React's `use`, which may be skipped conditionally, and that broke hook order on re-render.
+   */
+  useValue: () => T;
 }
 
 export function createStore<T>(key: string, fallback: T): Store<T> {
@@ -100,7 +104,6 @@ export function createStore<T>(key: string, fallback: T): Store<T> {
     get,
     set,
     update: (fn) => set(fn(get())),
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    use: () => useSyncExternalStore((cb) => subscribe(key, cb), get, get),
+    useValue: () => useSyncExternalStore((cb) => subscribe(key, cb), get, get),
   };
 }

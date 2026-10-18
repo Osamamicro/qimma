@@ -87,7 +87,7 @@ export function ReadingFillBlanksRenderer({ item, mode, onSubmit, onDraft, resul
       <ClozeText text={item.text} gaps={gaps} onGapPress={pressGap} disabled={locked} />
       <Card>
         <Text variant="caption" tone="muted">
-          WORD BANK
+          Word bank
         </Text>
         <Row>
           {bank.map((word, i) => {

@@ -48,14 +48,14 @@ export const DHA_2025_TARGETS: ScoreTarget[] = [
   {
     id: 'dha-proficient',
     name: 'Proficient',
-    description: 'Australia (DHA): R58 L59 S76 W69 — 10 points on the skilled migration test.',
+    description: 'Australia (DHA): R58 L59 S76 W69, worth 10 points on the skilled migration test.',
     exams: ['pte-academic'],
     skills: skills(58, 59, 76, 69),
   },
   {
     id: 'dha-superior',
     name: 'Superior',
-    description: 'Australia (DHA): R69 L70 S88 W85 — 20 points on the skilled migration test.',
+    description: 'Australia (DHA): R69 L70 S88 W85, worth 20 points on the skilled migration test.',
     exams: ['pte-academic'],
     skills: skills(69, 70, 88, 85),
   },

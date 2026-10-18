@@ -86,7 +86,7 @@ export function ReorderParagraphsRenderer({ item, mode, onSubmit, onDraft, resul
       <View style={{ flexDirection: wide ? 'row' : 'column', gap: 16 }}>
         <View style={{ flex: wide ? 1 : undefined, gap: 8 }}>
           <Text variant="caption" tone="muted">
-            SOURCE
+            Source
           </Text>
           {sources.length === 0 ? (
             <Text variant="small" tone="faint">
@@ -111,7 +111,7 @@ export function ReorderParagraphsRenderer({ item, mode, onSubmit, onDraft, resul
 
         <View style={{ flex: wide ? 1 : undefined, gap: 8 }}>
           <Text variant="caption" tone="muted">
-            YOUR ORDER
+            Your order
           </Text>
           {order.length === 0 ? (
             <Text variant="small" tone="faint">
@@ -175,7 +175,7 @@ export function ReorderParagraphsRenderer({ item, mode, onSubmit, onDraft, resul
       {result ? (
         <Card>
           <Text variant="caption" tone="muted">
-            CORRECT ORDER
+            Correct order
           </Text>
           <Text variant="subheading" style={{ fontVariant: ['tabular-nums'] }} selectable>
             {correctIds.map(labelOf).join(' → ')}

@@ -9,7 +9,7 @@ import { bookmarksStore, toggleBookmark, useSettings } from '@/services/app-stat
 export default function QuestionScreen() {
   const { type, id } = useLocalSearchParams<{ type: string; id: string }>();
   const settings = useSettings();
-  const bookmarks = bookmarksStore.use();
+  const bookmarks = bookmarksStore.useValue();
   const item = id ? getItem(id) : undefined;
 
   if (!item || !type || !isTaskTypeId(type)) {

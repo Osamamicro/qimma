@@ -32,7 +32,7 @@ function NotesHint() {
   return (
     <Card tone="primary">
       <Text variant="caption" tone="muted">
-        NOTES
+        Notes
       </Text>
       <Text>Take notes on keywords while you listen.</Text>
     </Card>

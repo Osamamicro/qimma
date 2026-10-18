@@ -20,7 +20,7 @@ const GRADE_VARIANT: Record<Grade, 'danger' | 'secondary' | 'primary'> = {
 
 /** Flashcards: the queue is fixed when the session starts, so grading never reshuffles it. */
 export function ReviewSession({ mode }: { mode: ReviewMode }) {
-  const cards = vocabStore.use();
+  const cards = vocabStore.useValue();
   const [queue] = useState(() => buildReviewQueue(vocabEntries, vocabStore.get(), Date.now(), mode));
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);

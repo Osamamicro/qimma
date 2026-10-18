@@ -2,11 +2,11 @@ import { router } from 'expo-router';
 import { useMemo } from 'react';
 import { View } from 'react-native';
 
-import { Button, Card, Chip, ProgressBar, Row, Screen, SectionTitle, Stat, Text } from '@/components/ui';
+import { Button, Card, Chip, ProgressBar, Row, ScoreScale, Screen, SectionTitle, Stat, Text } from '@/components/ui';
 import { getTarget, getTaskType, streakDays, type SkillId, type TaskTypeId } from '@/core';
 import { useAttempts, useEstimate, useTypeStats } from '@/features/stats';
 import { mocksStore, skillTargets, useSettings, type Attempt } from '@/services/app-state';
-import { useColors } from '@/theme';
+import { space, useColors } from '@/theme';
 
 const WINDOW_DAYS = 14;
 const DAY_LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -33,7 +33,7 @@ export default function ProgressTab() {
   const attempts = useAttempts();
   const estimate = useEstimate();
   const typeStats = useTypeStats();
-  const mocks = mocksStore.use();
+  const mocks = mocksStore.useValue();
   const targets = skillTargets(settings);
   const preset = getTarget(settings.targetId);
   const streak = streakDays(attempts, Date.now());
@@ -59,57 +59,32 @@ export default function ProgressTab() {
         <Text tone="muted">Estimates from your recent answers. They sharpen as you practise more task types.</Text>
       </View>
 
-      <Card>
-        <Row style={{ alignItems: 'flex-start' }} gap={16}>
-          <Stat label="Estimated" value={estimate.overall === null ? '—' : String(estimate.overall)} color={c.primary} />
-          <Stat label="Streak" value={`${streak}d`} color={c.warning} />
+      <View style={{ gap: space.lg }}>
+        <Row gap={space.xl}>
+          <Stat label="Estimated overall" value={estimate.overall === null ? 'n/a' : String(estimate.overall)} />
+          <Stat label="Day streak" value={String(streak)} />
           <Stat label="Attempts" value={String(attempts.length)} />
-          <Stat label="Mocks" value={String(mocks.length)} />
+          <Stat label="Mock tests" value={String(mocks.length)} />
         </Row>
         <Text variant="small" tone="muted">
-          {goal}. The line on each bar marks the goal for that skill.
+          {goal}. The orange notch on each scale marks the goal for that skill.
         </Text>
-        <View style={{ gap: 12 }}>
-          {estimate.skills.map((s) => {
-            const target = targets[s.skill];
-            const tickPct = ((target - 10) / 80) * 100;
-            return (
-              <View key={s.skill} style={{ gap: 4 }}>
-                <Row style={{ justifyContent: 'space-between' }}>
-                  <Text variant="small" style={{ textTransform: 'capitalize' }}>
-                    {s.skill}
-                  </Text>
-                  <Text variant="small" tone="muted" style={{ fontVariant: ['tabular-nums'] }}>
-                    {s.score === null ? 'no data yet' : `${s.score} / ${target}`}
-                  </Text>
-                </Row>
-                <View style={{ height: 8, justifyContent: 'center' }}>
-                  <ProgressBar value={s.score === null ? 0 : (s.score - 10) / 80} color={c.skill(s.skill)} />
-                  <View
-                    style={{
-                      position: 'absolute',
-                      left: `${tickPct}%`,
-                      top: -4,
-                      height: 16,
-                      width: 2,
-                      borderRadius: 1,
-                      backgroundColor: c.text,
-                    }}
-                  />
-                </View>
-                {s.score !== null && s.coverage < 0.5 ? (
-                  <Text variant="small" tone="faint">
-                    Based on {Math.round(s.coverage * 100)}% of the skill’s question types
-                  </Text>
-                ) : null}
-              </View>
-            );
-          })}
+        <View style={{ gap: space.md }}>
+          {estimate.skills.map((s) => (
+            <ScoreScale
+              key={s.skill}
+              label={s.skill}
+              score={s.score}
+              target={targets[s.skill]}
+              color={c.skill(s.skill)}
+              note={s.score !== null && s.coverage < 0.5 ? `Based on ${Math.round(s.coverage * 100)}% of this skill’s question types` : undefined}
+            />
+          ))}
         </View>
-        <Text variant="small" tone="faint">
-          Estimates are a guide, not an official PTE score.
+        <Text variant="caption" tone="faint">
+          Estimates are a study guide, not an official PTE score.
         </Text>
-      </Card>
+      </View>
 
       {attempts.length === 0 ? (
         <Card>
@@ -140,7 +115,7 @@ export default function ProgressTab() {
                   style={{
                     height: d.count === 0 ? 3 : Math.max(6, (d.count / busiest) * 64),
                     borderRadius: 3,
-                    backgroundColor: d.count === 0 ? c.surfaceAlt : c.primary,
+                    backgroundColor: d.count === 0 ? c.surfaceAlt : c.ink,
                   }}
                 />
               </View>
@@ -152,20 +127,20 @@ export default function ProgressTab() {
         </Row>
       </Card>
 
-      <SectionTitle title="Task types" action={<Text tone="faint">weakest first</Text>} />
+      <SectionTitle title="Task types" action={<Text variant="small" tone="muted">Weakest first</Text>} />
       {rows.length === 0 ? (
         <Text tone="muted">Your task stats appear here after your first attempt.</Text>
       ) : (
         <Card>
           <Row style={{ justifyContent: 'space-between' }}>
             <Text variant="caption" tone="muted" style={{ flex: 1 }}>
-              TASK
+              Task
             </Text>
             <Text variant="caption" tone="muted" style={{ width: 56, textAlign: 'right' }}>
-              TRIES
+              Tries
             </Text>
             <Text variant="caption" tone="muted" style={{ width: 56, textAlign: 'right' }}>
-              AVG
+              Average
             </Text>
           </Row>
           {rows.map(({ id, s }) => {
@@ -176,7 +151,7 @@ export default function ProgressTab() {
               <View key={id} style={{ gap: 4 }}>
                 <Row style={{ justifyContent: 'space-between' }}>
                   <Row style={{ flex: 1 }}>
-                    <Chip label={spec.code} selected color={c.skill(primary)} />
+                    <Chip label={spec.code} />
                     <Text variant="small" style={{ flexShrink: 1 }}>
                       {spec.name}
                     </Text>

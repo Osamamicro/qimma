@@ -128,6 +128,14 @@ Each item lists *done when*.
 
 ## 8. Gotchas
 
+- Store hooks are `store.useValue()`, never a method named `use`. The React Compiler treats `use()`
+  calls like React's `use`, may skip them, and that broke hook order whenever the theme or window
+  size changed (the Today screen went blank).
+- Design system (2026-10-18 redesign): tokens in `src/theme` (neutral ink, one vermilion accent,
+  colour-blind-safe skill colours, IBM Plex Sans, radius 6/8/12); kit in `src/components/ui`
+  (`ScoreScale` 10-90 ruler, `ListGroup`/`ListRow`, `Segmented`, `PressableScale`). Motion is
+  Reanimated, state-only, 140-480 ms, and respects reduced motion. No uppercase eyebrow labels,
+  no em-dashes in UI copy.
 - Web builds for Pages use `EXPO_BASE_URL=/qimma` (read by `app.config.js`). Local dev leaves it
   unset, so the app runs at `/`. Deep links on Pages return HTTP 404 with the app shell
   (`404.html`); they render correctly.

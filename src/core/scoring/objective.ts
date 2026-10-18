@@ -30,7 +30,7 @@ export function scoreMultipleChoice(options: Option[], answers: string[], select
   const right = unique.filter((s) => answers.includes(s)).length;
   const wrong = unique.length - right;
   const feedback = [`${right} correct, ${wrong} incorrect selection${wrong === 1 ? '' : 's'}.`];
-  if (wrong > 0) feedback.push('Each wrong choice subtracts a point — only pick options you are sure about.');
+  if (wrong > 0) feedback.push('Each wrong choice subtracts a point, so only pick options you are sure about.');
   return objectiveResult(right - wrong, answers.length, feedback, optionText(options, answers));
 }
 

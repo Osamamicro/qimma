@@ -1,18 +1,33 @@
+import { IBMPlexSans_400Regular } from '@expo-google-fonts/ibm-plex-sans/400Regular';
+import { IBMPlexSans_500Medium } from '@expo-google-fonts/ibm-plex-sans/500Medium';
+import { IBMPlexSans_600SemiBold } from '@expo-google-fonts/ibm-plex-sans/600SemiBold';
+import { IBMPlexSans_700Bold } from '@expo-google-fonts/ibm-plex-sans/700Bold';
+import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme, View } from 'react-native';
 
 import { StorageBanner } from '@/features/backup/storage-banner';
-import { useColors } from '@/theme';
+import { FONTS, useColors } from '@/theme';
 
 export default function RootLayout() {
   const scheme = useColorScheme();
   const c = useColors();
+  // Each weight is its own file; a missing font falls back to the system face rather than blocking.
+  const [fontsLoaded, fontError] = useFonts({ IBMPlexSans_400Regular, IBMPlexSans_500Medium, IBMPlexSans_600SemiBold, IBMPlexSans_700Bold });
   const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
   const theme = {
     ...base,
     colors: { ...base.colors, primary: c.primary, background: c.background, card: c.surface, text: c.text, border: c.border },
+    fonts: {
+      regular: { fontFamily: FONTS.regular, fontWeight: '400' as const },
+      medium: { fontFamily: FONTS.medium, fontWeight: '500' as const },
+      bold: { fontFamily: FONTS.semibold, fontWeight: '600' as const },
+      heavy: { fontFamily: FONTS.bold, fontWeight: '700' as const },
+    },
   };
+  // Native needs the font files before first use; the web swaps them in as they arrive.
+  if (!fontsLoaded && !fontError && process.env.EXPO_OS !== 'web') return <View style={{ flex: 1, backgroundColor: c.background }} />;
   return (
     <ThemeProvider value={theme}>
       <StatusBar style="auto" />

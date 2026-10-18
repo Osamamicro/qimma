@@ -16,7 +16,7 @@ export default function TaskTypeScreen() {
   const c = useColors();
   const settings = useSettings();
   const stats = useTypeStats();
-  const bookmarks = bookmarksStore.use();
+  const bookmarks = bookmarksStore.useValue();
   const [filter, setFilter] = useState<Filter>('all');
   const [showGuide, setShowGuide] = useState(false);
 
@@ -74,7 +74,7 @@ export default function TaskTypeScreen() {
               {guide.template ? (
                 <View style={{ gap: 4 }}>
                   <Text variant="caption" tone="muted">
-                    TEMPLATE
+                    Template
                   </Text>
                   <Text selectable style={{ fontStyle: 'italic' }}>
                     {guide.template}
@@ -84,7 +84,7 @@ export default function TaskTypeScreen() {
               {guide.commonMistakes.length > 0 && (
                 <View style={{ gap: 4 }}>
                   <Text variant="caption" tone="muted">
-                    AVOID
+                    Avoid
                   </Text>
                   {guide.commonMistakes.map((m, i) => (
                     <Text key={i}>• {m}</Text>

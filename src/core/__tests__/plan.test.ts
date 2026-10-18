@@ -77,7 +77,7 @@ describe('minutesPerItem', () => {
 describe('buildDailyPlan: order of tasks', () => {
   it('opens with the Describe Image anchor, then one rotation task, then the top-ranked task', () => {
     const plan = buildDailyPlan(academic, settings(), untested(), 0, NOW);
-    expect(plan.tasks[0]).toMatchObject({ taskType: 'describe-image', count: 2, reason: '31% of Speaking — practise daily' });
+    expect(plan.tasks[0]).toMatchObject({ taskType: 'describe-image', count: 2, reason: '31% of Speaking, practise daily' });
     expect(plan.tasks[1].reason).toBe(ROTATION);
     // Repeat Sentence has the most value per minute: Speaking 16% + Listening 17% at 0.75 min.
     expect(plan.tasks[2].taskType).toBe('repeat-sentence');
@@ -119,7 +119,7 @@ describe('buildDailyPlan: order of tasks', () => {
 describe('buildDailyPlan: Describe Image anchor', () => {
   it('adds two Describe Image tasks a day while speaking is below target', () => {
     const plan = buildDailyPlan(academic, settings(), scored({ speaking: 60, writing: 90, reading: 90, listening: 90 }), 0, NOW);
-    expect(plan.tasks[0]).toMatchObject({ taskType: 'describe-image', count: 2, reason: '31% of Speaking — practise daily' });
+    expect(plan.tasks[0]).toMatchObject({ taskType: 'describe-image', count: 2, reason: '31% of Speaking, practise daily' });
   });
 
   it('drops the anchor once the speaking target is met', () => {
