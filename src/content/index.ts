@@ -1,12 +1,25 @@
 import type { Item, ItemOf, TaskTypeId } from '@/core';
 import { guides } from './guides';
 import { listeningItems } from './listening';
+import { listeningExtraItems } from './listening-extra';
 import { readingItems } from './reading';
+import { readingExtraItems } from './reading-extra';
 import { speakingItems } from './speaking';
+import { speakingExtraItems } from './speaking-extra';
+import { speakingVisualItems } from './speaking-visual';
 import { vocabEntries } from './vocab';
 import { writingItems } from './writing';
 
-export const ALL_ITEMS: Item[] = [...speakingItems, ...writingItems, ...readingItems, ...listeningItems];
+export const ALL_ITEMS: Item[] = [
+  ...speakingItems,
+  ...speakingExtraItems,
+  ...speakingVisualItems,
+  ...writingItems,
+  ...readingItems,
+  ...readingExtraItems,
+  ...listeningItems,
+  ...listeningExtraItems,
+];
 
 const byId = new Map(ALL_ITEMS.map((i) => [i.id, i]));
 

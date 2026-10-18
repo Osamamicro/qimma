@@ -21,18 +21,18 @@ Australian Home Affairs scale, R69 L70 S88 W85 on PTE Academic.
 | Web | GitHub Pages: https://osamamicro.github.io/qimma/ (deployed by `.github/workflows/pages.yml` on every push to `main`). |
 | CI | `.github/workflows/ci.yml` runs typecheck, tests and the web build on every PR and push. |
 | Task types | All 22 PTE Academic types + PTE Core *Write Email*. One renderer per type in `src/features/practice/{speaking,writing,reading,listening}`. |
-| Content | 238 original items, 220 vocabulary entries, a strategy guide per task type (`src/content/`). |
+| Content | 304 original items (enough for three full mocks without repeats in both exams), 220 vocabulary entries, a strategy guide per task type (`src/content/`). |
 | Scoring | Exact PTE rules for objective tasks. Trait-level heuristic estimates for speaking and writing, with a 25% on-topic floor (`src/core/scoring`). |
 | Official data | Pearson weighting (Aug 2025), DHA 2025 targets and test-structure ranges, all in `src/core/exams/`. |
 | Features | Practice player, full/mini/section mocks + report, vocab SRS (SM-2), daily plan, progress, settings, progress backup (JSON export/import with merge, storage-failure banner; ADR-013). |
-| Quality | `tsc` clean, Vitest 283/283, web export OK; the main flows were checked manually and with headless Playwright during development at a 390px viewport (no e2e specs are committed). |
+| Quality | `tsc` clean, Vitest 284/284, web export OK; the main flows were checked manually and with headless Playwright during development at a 390px viewport (no e2e specs are committed). |
 | Emulator | `scripts/setup-android-emulator.{ps1,sh}` (one-time setup) + `npm run emulator:android`. |
 
 **Verified on the owner's Windows PC (2026-10-18):** the setup script, the emulator launcher,
 the app in Expo Go (SDK 58) on an Android 36 emulator, Repeat Sentence text-to-speech, and
 microphone recording and playback. iOS and a physical phone are still unverified.
 
-**Last check (2026-10-18, owner's Windows PC):** `npm run check` (tsc clean, 283/283) and the
+**Last check (2026-10-18, owner's Windows PC):** `npm run check` (tsc clean, 284/284) and the
 web build are green. Item 2 (backup) works in the browser (export, import with merge preview,
 storage-failure banner) and in the Android emulator (share-sheet export, file-picker import).
 
@@ -43,7 +43,7 @@ git clone https://github.com/Osamamicro/qimma.git
 cd qimma
 npm install
 npx expo start --web --port 8099   # once, then Ctrl+C: generates .expo/types for typed routes
-npm run check                      # typecheck + 283 tests; must be green before you change anything
+npm run check                      # typecheck + 284 tests; must be green before you change anything
 npm run web                        # Chrome/Edge (speech scoring needs the Web Speech API)
 npm run emulator:android           # after the one-time setup script; see docs/EMULATOR.md
 ```
@@ -112,7 +112,7 @@ Each item lists *done when*.
    only counts when it appears with the right trend word in the same sentence.
 6. **Summarize Group Discussion note grid (ADR-011).** One note column per speaker during the
    audio, and speaker-tagged key points.
-7. **Content to 1,000 items,** using content-author agents plus a human review checklist. Add
+7. **Content to 1,000 items** (304 on 2026-10-18; every task type now covers three full mocks without repeats), using content-author agents plus a human review checklist. Add
    recorded audio for listening (the `audio` field overrides text-to-speech).
 8. **Tooling.** Add an ESLint config so `expo lint` can run in CI. CI and the Pages deploy already exist.
 9. **Later:** accounts and sync (Supabase anonymous auth), teacher mode, then IELTS, TOEFL and

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { itemsOfType } from '@/content';
 import { AI_SCORED_NOTE, aiScoreRequest, isAiWritingItem, mergeAiScore, scoreItem, wordCount, type AiScoreReply } from '@/core';
-import { FALLBACK_NOTE, scoreResponse, type AiScoringConfig } from '@/services/ai-scoring';
+import { CANCELLED_NOTE, FALLBACK_NOTE, scoreResponse, type AiScoringConfig } from '@/services/ai-scoring';
 
 import { validateRequest, replyFormat, parseReply, buildUserMessage } from '../../../supabase/functions/score-writing/rubric';
 
@@ -109,6 +109,17 @@ describe('scoreResponse (service with fallback)', () => {
     expect(body).toMatchObject({ model: 'qwen3:8b', stream: false, think: false });
     expect(body.format.properties.scores.required).toContain('content');
     expect(result.feedback[0]).toBe(AI_SCORED_NOTE);
+  });
+
+  it('returns the on-device score at once when the learner cancels', async () => {
+    const hang: AiScoringConfig['fetch'] = (_url, init) =>
+      new Promise((_resolve, reject) => init?.signal?.addEventListener('abort', () => reject(new Error('aborted'))));
+    const cancel = new AbortController();
+    const pending = scoreResponse(essay, { kind: 'text', text: essayText }, { localUrl: 'http://localhost:11434', fetch: hang, timeoutMs: 60_000 }, cancel.signal);
+    cancel.abort();
+    const result = await pending;
+    expect(result.feedback[0]).toBe(CANCELLED_NOTE);
+    expect(result.total).toBe(scoreItem(essay, { kind: 'text', text: essayText }).total);
   });
 
   it('local mode falls back when Ollama is not running', async () => {
