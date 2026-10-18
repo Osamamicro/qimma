@@ -17,7 +17,9 @@ Australian Home Affairs scale, R69 L70 S88 W85 on PTE Academic.
 
 | Area | State |
 | --- | --- |
-| Code | Branch `claude/english-learning-platform-12dh5f`. Draft PR #7 into `main` of `Osamamicro/Osamamicro.github.io`. The app lives in `qimma/`. |
+| Code | Repository `Osamamicro/qimma`, app at the root, `main` branch. It began in `Osamamicro/Osamamicro.github.io` (PR #7) and moved here with ADR-010. |
+| Web | GitHub Pages: https://osamamicro.github.io/qimma/ (deployed by `.github/workflows/pages.yml` on every push to `main`). |
+| CI | `.github/workflows/ci.yml` runs typecheck, tests and the web build on every PR and push. |
 | Task types | All 22 PTE Academic types + PTE Core *Write Email*. One renderer per type in `src/features/practice/{speaking,writing,reading,listening}`. |
 | Content | 238 original items, 220 vocabulary entries, a strategy guide per task type (`src/content/`). |
 | Scoring | Exact PTE rules for objective tasks. Trait-level heuristic estimates for speaking and writing, with a 25% on-topic floor (`src/core/scoring`). |
@@ -36,9 +38,7 @@ microphone/text-to-speech behaviour on a device. The original sandbox had no KVM
 ## 3. First 10 minutes
 
 ```bash
-git clone https://github.com/Osamamicro/Osamamicro.github.io.git
-cd Osamamicro.github.io
-git checkout claude/english-learning-platform-12dh5f   # skip if PR #7 is already merged into main
+git clone https://github.com/Osamamicro/qimma.git
 cd qimma
 npm install
 npx expo start --web --port 8099   # once, then Ctrl+C: generates .expo/types for typed routes
@@ -46,9 +46,6 @@ npm run check                      # typecheck + 237 tests; must be green before
 npm run web                        # Chrome/Edge (speech scoring needs the Web Speech API)
 npm run emulator:android           # after the one-time setup script; see docs/EMULATOR.md
 ```
-
-If the project has moved to its own repository (see §7), the app sits at that repo's root
-instead of `qimma/`.
 
 ## 4. Read these next (in order)
 
@@ -66,7 +63,7 @@ Key contracts:
 
 ## 5. How work is done here
 
-- **Team model.** Agents are defined in `.claude/agents/` at the repo root (see `docs/TEAM.md`):
+- **Team model.** Agents are defined in `.claude/agents/` (see `docs/TEAM.md`):
   - You act as the **orchestrator**. You plan, write contracts and reference code, review and
     integrate.
   - **Implementer** and **content-author** agents run on Haiku and work in parallel, each on
@@ -81,7 +78,7 @@ Key contracts:
   Install packages with `npx expo install`.
 - **Before every commit:** run `npm run check`. For UI changes, also run `npm run build:web` and
   take a screenshot at 390px and 1280px widths.
-- **Commit and push to the working branch,** then keep the PR description current.
+- **Work on a branch, open a PR** (CI must be green), then merge to `main`, which deploys the web app.
 
 ### Non-negotiables
 
@@ -121,22 +118,21 @@ Each item lists *done when*.
    audio, and speaker-tagged key points.
 7. **Content to 1,000 items,** using content-author agents plus a human review checklist. Add
    recorded audio for listening (the `audio` field overrides text-to-speech).
-8. **Tooling.** ESLint config for `expo lint`; a CI workflow (GitHub Actions) running
-   `npm run check` on PRs.
+8. **Tooling.** Add an ESLint config so `expo lint` can run in CI. CI and the Pages deploy already exist.
 9. **Later:** accounts and sync (Supabase anonymous auth), teacher mode, then IELTS, TOEFL and
    DET as new `ExamSpec`s.
 
 ## 7. Decisions waiting on the owner
 
-- **Hosting.** Recommended: move `qimma/` to its own repo (`Osamamicro/qimma`), as was done with
-  the triathlon prototype, and deploy with GitHub Actions to Pages. Set
-  `experiments.baseUrl: "/qimma"` and add an SPA `404.html`. The alternative is switching this
-  user-site repo's Pages source to Actions.
-- **Merging PR #7.**
+- **GitHub Pages source.** In the repo's Settings → Pages, choose **GitHub Actions** once,
+  or the deploy job cannot publish.
 - **AI services.** Supabase project and Anthropic API key for the scoring service (v0.2 item 3).
 
 ## 8. Gotchas
 
+- Web builds for Pages use `EXPO_BASE_URL=/qimma` (read by `app.config.js`). Local dev leaves it
+  unset, so the app runs at `/`. Deep links on Pages return HTTP 404 with the app shell
+  (`404.html`); they render correctly.
 - Typed routes only exist after `expo start` has generated `.expo/types`. Without them, `tsc`
   does not check `router.push` paths.
 - Expo Go must match SDK 58. If the emulator has an old Expo Go, `npx expo start --android`
@@ -152,10 +148,10 @@ Each item lists *done when*.
 
 ## 9. Kickoff prompt for a new session
 
-> You are continuing the Qimma project. Read `qimma/HANDOFF.md`, then `docs/team/BRIEF.md` and
+> You are continuing the Qimma project (`Osamamicro/qimma`). Read `HANDOFF.md`, then `docs/team/BRIEF.md` and
 > `docs/DECISIONS.md`. Run the "First 10 minutes" commands and report the results. Then take
 > backlog item 1 (or the next unfinished one). Use the team workflow in `docs/TEAM.md`: plan as
 > orchestrator, delegate file-owned pieces to Haiku implementers, and verify with
-> `npm run check`, a web build and screenshots. Then commit, push and update the PR.
+> `npm run check`, a web build and screenshots. Then open a PR, get CI green and merge.
 
 You can also run the project skill **`/continue-qimma`**, which does the same.

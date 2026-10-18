@@ -4,7 +4,7 @@ Target folder: `C:\Users\GACA-IT\Desktop\GACA Projects\repos\qimma`
 
 ## Status at handoff (2026-10-18, cloud session)
 
-- PR #7 (draft) is still open and not merged. Branch: `claude/english-learning-platform-12dh5f`.
+- Qimma moved to its own repo, `Osamamicro/qimma` (ADR-010). The app is at the repo root on `main`.
 - The baseline was checked again in a Linux container. `npm install` worked, typed routes were
   generated, and `npm run check` passed: tsc clean, 237/237 tests.
 - No app code changed. Backlog item 1 cannot run in the cloud: there is no KVM for the emulator
@@ -16,16 +16,13 @@ If `repos\qimma` does not exist yet:
 
 ```powershell
 cd "C:\Users\GACA-IT\Desktop\GACA Projects\repos"
-git clone https://github.com/Osamamicro/Osamamicro.github.io.git qimma
+git clone https://github.com/Osamamicro/qimma.git
 cd qimma
-git checkout claude/english-learning-platform-12dh5f
-cd qimma            # the app is in the qimma\ subfolder of the repo
 ```
 
-If it already exists, run `git fetch origin`, `git checkout claude/english-learning-platform-12dh5f`
-and `git pull`, then `cd qimma`.
+If it already exists, run `git checkout main` and `git pull`.
 
-Run every npm command in the app folder `repos\qimma\qimma`, which contains `package.json`.
+Run every npm command in `repos\qimma`, which contains `package.json`.
 
 ## 2. Baseline (about 5 minutes)
 
@@ -127,7 +124,7 @@ These came from reading the scripts. **None of them has been confirmed on Window
 
 ## 6. Kickoff prompt for Claude Code on this PC
 
-> Continue Qimma on my Windows PC. Read `qimma/HANDOFF.md` and `qimma/docs/LOCAL-PC.md`.
+> Continue Qimma on my Windows PC. Read `HANDOFF.md` and `docs/LOCAL-PC.md`.
 > Run the baseline (npm install, expo start --web once, npm run check) and report the result.
 > Then do backlog item 1 with me: run the setup script and the emulator launcher, and fix
 > what breaks in `scripts/` and `docs/EMULATOR.md`, starting with the list in LOCAL-PC.md §3.

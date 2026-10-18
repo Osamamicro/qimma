@@ -153,3 +153,11 @@ name, so it stays valid as IELTS, TOEFL, courses and materials arrive. It nods t
 Riyadh base, and no English-learning app with that name turned up. The project folder, package,
 bundle id (`com.osamamicro.qimma`), URL scheme, storage prefix and emulator AVD (`Qimma_Pixel`)
 all use `qimma`.
+
+### ADR-010 — outcome
+
+The owner chose a separate repository. Qimma now lives in `Osamamicro/qimma` with the app at the
+root, the agent team in `.claude/agents/` and the skills in `.claude/skills/`. The web app
+deploys to GitHub Pages at `https://osamamicro.github.io/qimma/` through
+`.github/workflows/pages.yml`: `EXPO_BASE_URL=/qimma` via `app.config.js`, with `404.html` as
+the SPA fallback. `.github/workflows/ci.yml` gates PRs with typecheck, tests and the web build.

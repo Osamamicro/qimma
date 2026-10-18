@@ -6,7 +6,9 @@ level) in English exams. It is an original, cross-platform exam trainer that run
 **PTE Core**. Later releases will add more exams (IELTS, TOEFL, Duolingo), MOOC-style
 courses and study materials.
 
-> **Continuing development?** Start with [HANDOFF.md](HANDOFF.md).
+**Try it:** https://osamamicro.github.io/qimma/ (use Chrome or Edge for speech scoring)
+
+> **Continuing development?** Start with [HANDOFF.md](HANDOFF.md), or run `/continue-qimma` in Claude Code.
 
 - **All task types.** It covers all 22 PTE Academic task types and PTE Core's *Write Email*.
   Each one has a strategy guide, a template and common mistakes to avoid.
@@ -32,6 +34,7 @@ courses and study materials.
 Requirements: Node 22+ and npm.
 
 ```bash
+git clone https://github.com/Osamamicro/qimma.git
 cd qimma
 npm install
 npm run web            # web app at http://localhost:8081 (use Chrome/Edge for speech scoring)

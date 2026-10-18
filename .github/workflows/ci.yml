@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Typed routes live in .expo/types, which only `expo start` generates; tsc needs them.
+      - name: Generate Expo Router types
+        run: timeout 60 npx expo start --web --port 8099 >/dev/null 2>&1 || true
+        env:
+          CI: '1'
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build:web

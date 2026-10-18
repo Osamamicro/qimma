@@ -15,7 +15,7 @@ It is a **clean-room** product. Never copy questions, text, audio, images, UI co
 from APEUni or any other prep platform, and never use "real exam" memory dumps. Every
 question you write must be original. Do not name competitors in the app.
 
-## Stack and layout (app root: `qimma/`)
+## Stack and layout (app at the repository root)
 
 - Expo SDK 58, React Native 0.88, React 19, Expo Router (routes in `src/app/`), TypeScript strict.
 - `src/core/` — pure TypeScript domain (no React Native imports): exam specs, content types,
@@ -48,7 +48,7 @@ question you write must be original. Do not name competitors in the app.
 1. **Only edit the files you own** (listed in your assignment). If you need a change elsewhere,
    write it in your final report instead. Never edit `package.json`, never install packages,
    never run `git commit`/`git push`, never start dev servers (`expo start`).
-2. Before finishing, run from `qimma/`:
+2. Before finishing, run from the repository root:
    - `npx tsc --noEmit 2>&1 | grep -E '<your paths>'` → must print nothing for your files.
    - `npx vitest run` → your tests and the content-bank test must pass for your files.
    Other team members edit in parallel; if an error is clearly in a file you do not own, ignore it.

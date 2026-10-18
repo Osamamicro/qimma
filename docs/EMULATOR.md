@@ -48,8 +48,8 @@ Open **PowerShell** (Start, type "PowerShell"). Run the commands in the project 
 ### 2.1 Get the code and install packages (once)
 
 ```powershell
-git clone https://github.com/Osamamicro/Osamamicro.github.io.git
-cd Osamamicro.github.io\qimma
+git clone https://github.com/Osamamicro/qimma.git
+cd qimma
 npm install
 ```
 
@@ -119,8 +119,8 @@ browser speech recognition is used where it is available (section 6).
 ### 3.1 Android (emulator)
 
 ```bash
-git clone https://github.com/Osamamicro/Osamamicro.github.io.git
-cd Osamamicro.github.io/qimma
+git clone https://github.com/Osamamicro/qimma.git
+cd qimma
 npm install
 bash scripts/setup-android-emulator.sh   # once
 npm run emulator:android                 # every day
@@ -146,8 +146,8 @@ open the Simulator if it is not already open.
 ## 4. Linux
 
 ```bash
-git clone https://github.com/Osamamicro/Osamamicro.github.io.git
-cd Osamamicro.github.io/qimma
+git clone https://github.com/Osamamicro/qimma.git
+cd qimma
 npm install
 bash scripts/setup-android-emulator.sh   # once
 npm run emulator:android                 # every day
