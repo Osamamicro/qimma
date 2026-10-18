@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { KeyPoint, ScoreResult, TraitId } from '@/core';
-import { scoreWriteEmail, scoreWriteEssay, scoreSummarizeWrittenText } from '@/core';
+import { getTaskType, scoreWriteEmail, scoreWriteEssay, scoreSummarizeWrittenText } from '@/core';
 
 const trait = (r: ScoreResult, id: TraitId) => r.traits.find((t) => t.id === id)!;
 
@@ -164,5 +164,14 @@ describe('Write Email: conventions', () => {
     const r = scoreWriteEmail('Dear Ms Lee, I will be late. Sam', emailPoints, 'formal', 'model');
     expect(trait(r, 'form').score).toBe(0);
     expect(r.total).toBe(0);
+  });
+});
+
+describe('word ranges come from the task spec', () => {
+  it('reads the full-credit word range for each written task', () => {
+    expect(getTaskType('write-essay').timing.words).toEqual([200, 300]);
+    expect(getTaskType('summarize-written-text').timing.words).toEqual([5, 75]);
+    expect(getTaskType('summarize-spoken-text').timing.words).toEqual([50, 70]);
+    expect(getTaskType('write-email').timing.words).toEqual([50, 120]);
   });
 });

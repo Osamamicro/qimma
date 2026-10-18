@@ -58,8 +58,17 @@ const LONG_TASKS: TaskTypeId[] = [
 
 export const minutesPerItem = (t: TaskTypeId) => MINUTES[t] ?? 1.5;
 
+/** True for a real YYYY-MM-DD calendar date (rejects 2025-02-30 and 2025-13-45, which Date would roll over or reject inconsistently). */
+export function isCalendarDate(value: string): boolean {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!m) return false;
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const date = new Date(Date.UTC(y, mo - 1, d));
+  return date.getUTCFullYear() === y && date.getUTCMonth() === mo - 1 && date.getUTCDate() === d;
+}
+
 export function daysUntil(examDate: string | null, now: number): number | null {
-  if (!examDate) return null;
+  if (!examDate || !isCalendarDate(examDate)) return null;
   const target = new Date(`${examDate}T00:00:00`).getTime();
   if (Number.isNaN(target)) return null;
   return Math.max(0, Math.ceil((target - now) / 86400000));

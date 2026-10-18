@@ -12,10 +12,12 @@ export function useCountdown(seconds: number, running: boolean, onDone?: () => v
 
   useEffect(() => {
     if (!running) return;
+    // Always count from the full window: a stale `left` (e.g. 0 from an earlier run) would end
+    // the countdown on the first tick.
+    setLeft(seconds);
     const started = Date.now();
-    const initial = left;
     const id = setInterval(() => {
-      const next = Math.max(0, initial - Math.floor((Date.now() - started) / 1000));
+      const next = Math.max(0, seconds - Math.floor((Date.now() - started) / 1000));
       setLeft(next);
       if (next === 0) {
         clearInterval(id);

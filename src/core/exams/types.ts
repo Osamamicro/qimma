@@ -73,6 +73,8 @@ export interface TaskTiming {
   suggestedSec?: number;
   /** How many times the audio may be played in exam mode. */
   audioPlays?: number;
+  /** Full-credit word range for written answers, inclusive. */
+  words?: [min: number, max: number];
 }
 
 export interface TaskTypeSpec {

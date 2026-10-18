@@ -16,6 +16,7 @@ const REGISTER_LABEL: Record<WriteEmailItem['register'], string> = {
 /** Write Email: 50–120 words covering every bullet point, in the 9-minute response window. */
 export function WriteEmailRenderer({ item, mode, onSubmit, onDraft, result }: RendererProps<WriteEmailItem>) {
   const seconds = getTaskType(item.type).timing.responseSec ?? 540;
+  const [minWords, maxWords] = getTaskType(item.type).timing.words ?? [50, 120];
   const { text, change, submit, done, timeLeft, timerActive } = useTimedText({
     seconds,
     locked: !!result,
@@ -47,7 +48,7 @@ export function WriteEmailRenderer({ item, mode, onSubmit, onDraft, result }: Re
           </View>
         ))}
       </View>
-      <WritingBox value={text} onChange={change} minWords={50} maxWords={120} minHeight={220} disabled={done} />
+      <WritingBox value={text} onChange={change} minWords={minWords} maxWords={maxWords} minHeight={220} disabled={done} />
       <SubmitBar mode={mode} submitted={done} disabled={text.trim() === '' || done} onPress={submit} />
     </View>
   );

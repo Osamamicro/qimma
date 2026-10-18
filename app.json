@@ -14,7 +14,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#3347D1",
+        "backgroundColor": "#C2410C",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -30,14 +30,14 @@
       "favicon": "./assets/images/favicon.png",
       "name": "Qimma",
       "shortName": "Qimma",
-      "themeColor": "#3347D1"
+      "themeColor": "#C2410C"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#3347D1",
+          "backgroundColor": "#C2410C",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }

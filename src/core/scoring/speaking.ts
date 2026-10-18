@@ -59,6 +59,8 @@ export function pronunciationBand(confidence: number | null | undefined, recogni
 }
 
 function noTranscript(taskType: TaskTypeId, response: SpeechResponse, answer?: string): ScoreResult {
+  // Nothing recorded (question skipped): every trait counts and scores 0, as an unanswered item would.
+  if (response.durationMs <= 0) return build(taskType, {}, ['No recording was made for this question.'], answer);
   const spec = getTaskType(taskType);
   const contentTrait = spec.traits[0];
   const values: TraitValues = {};

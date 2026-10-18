@@ -10,6 +10,7 @@ import { useTimedText } from './use-timed-text';
 /** Summarize Written Text: one sentence of 5–75 words, within the task's response window. */
 export function SummarizeWrittenTextRenderer({ item, mode, onSubmit, onDraft, result }: RendererProps<SummarizeWrittenTextItem>) {
   const seconds = getTaskType(item.type).timing.responseSec ?? 600;
+  const [minWords, maxWords] = getTaskType(item.type).timing.words ?? [5, 75];
   const { text, change, submit, done, timeLeft, timerActive } = useTimedText({
     seconds,
     locked: !!result,
@@ -29,7 +30,7 @@ export function SummarizeWrittenTextRenderer({ item, mode, onSubmit, onDraft, re
           </Text>
         ) : null}
       </Row>
-      <WritingBox value={text} onChange={change} minWords={5} maxWords={75} minHeight={120} disabled={done} />
+      <WritingBox value={text} onChange={change} minWords={minWords} maxWords={maxWords} minHeight={120} disabled={done} />
       <SubmitBar mode={mode} submitted={done} disabled={text.trim() === '' || done} onPress={submit} />
     </View>
   );

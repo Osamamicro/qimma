@@ -71,11 +71,12 @@ export function scoreSummarizeWrittenText(text: string, keyPoints: KeyPoint[], m
   const sentences = splitSentences(text);
   const values: TraitValues = {};
 
+  const [min, max] = getTaskType('summarize-written-text').timing.words!;
   const oneSentence = sentences.length === 1 && /[.!?]$/.test(text.trim());
-  values.form = oneSentence && words.length >= 5 && words.length <= 75 ? 1 : 0;
+  values.form = oneSentence && words.length >= min && words.length <= max ? 1 : 0;
   if (values.form === 0) {
     feedback.push(
-      `Form: write exactly one sentence ending with a full stop, 5–75 words (you wrote ${sentences.length} sentence(s), ${words.length} words).`,
+      `Form: write exactly one sentence ending with a full stop, ${min}–${max} words (you wrote ${sentences.length} sentence(s), ${words.length} words).`,
     );
     return build('summarize-written-text', {}, feedback, modelAnswer);
   }
@@ -94,8 +95,9 @@ export function scoreSummarizeSpokenText(text: string, keyPoints: KeyPoint[], mo
   const words = tokenize(text);
   const values: TraitValues = {};
   const n = words.length;
-  values.form = n >= 50 && n <= 70 ? 2 : (n >= 40 && n < 50) || (n > 70 && n <= 100) ? 1 : 0;
-  if (values.form < 2) feedback.push(`Form: aim for 50–70 words (you wrote ${n}).`);
+  const [min, max] = getTaskType('summarize-spoken-text').timing.words!;
+  values.form = n >= min && n <= max ? 2 : (n >= 40 && n < 50) || (n > 70 && n <= 100) ? 1 : 0;
+  if (values.form < 2) feedback.push(`Form: aim for ${min}–${max} words (you wrote ${n}).`);
   if (values.form === 0) return build('summarize-spoken-text', {}, feedback, modelAnswer);
 
   const coverage = keyPointCoverage(text, keyPoints);
@@ -128,8 +130,9 @@ export function scoreWriteEssay(text: string, keyPoints: KeyPoint[], modelAnswer
   const lower = text.toLowerCase();
   const values: TraitValues = {};
 
-  values.form = n >= 200 && n <= 300 ? 2 : (n >= 120 && n < 200) || (n > 300 && n <= 380) ? 1 : 0;
-  if (values.form < 2) feedback.push(`Form: aim for 200–300 words (you wrote ${n}).`);
+  const [min, max] = getTaskType('write-essay').timing.words!;
+  values.form = n >= min && n <= max ? 2 : (n >= 120 && n < 200) || (n > 300 && n <= 380) ? 1 : 0;
+  if (values.form < 2) feedback.push(`Form: aim for ${min}–${max} words (you wrote ${n}).`);
   if (values.form === 0 || text === text.toUpperCase()) return build('write-essay', {}, feedback, modelAnswer);
 
   const coverage = keyPointCoverage(text, keyPoints);
@@ -186,8 +189,9 @@ export function scoreWriteEmail(
   const n = words.length;
   const values: TraitValues = {};
 
-  values.form = n >= 50 && n <= 120 ? 2 : (n >= 30 && n < 50) || (n > 120 && n <= 140) ? 1 : 0;
-  if (values.form < 2) feedback.push(`Formal requirements: aim for 50–120 words (you wrote ${n}).`);
+  const [min, max] = getTaskType('write-email').timing.words!;
+  values.form = n >= min && n <= max ? 2 : (n >= 30 && n < 50) || (n > 120 && n <= 140) ? 1 : 0;
+  if (values.form < 2) feedback.push(`Formal requirements: aim for ${min}–${max} words (you wrote ${n}).`);
   if (values.form === 0) return build('write-email', {}, feedback, modelAnswer);
 
   const coverage = keyPointCoverage(text, bulletPoints);

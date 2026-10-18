@@ -117,6 +117,17 @@ describe('scoreResponse (service with fallback)', () => {
     expect(result.feedback[0]).toBe(FALLBACK_NOTE);
   });
 
+  it('does not call the service when on-device form is 0 (e.g. empty text from the timer)', async () => {
+    const fetchImpl = vi.fn(ok);
+    for (const text of ['', 'Too short to count.']) {
+      const result = await scoreResponse(essay, { kind: 'text', text }, config(fetchImpl));
+      expect(result).toEqual(scoreItem(essay, { kind: 'text', text }));
+      expect(result.total).toBe(0);
+    }
+    await scoreResponse(essay, { kind: 'text', text: '' }, { localUrl: 'http://localhost:11434', fetch: fetchImpl, timeoutMs: 50 });
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
   it('does not call the service when no URL is set or the task is not writing', async () => {
     const fetchImpl = vi.fn(ok);
     await scoreResponse(essay, { kind: 'text', text: essayText }, config(fetchImpl, ''));
