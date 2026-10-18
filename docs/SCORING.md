@@ -43,6 +43,22 @@ Needs a transcript (web: browser speech recognition).
 - No transcript (Expo Go on phones): the learner self-rates content; fluency and pronunciation
   are shown as "—" rather than invented.
 
+## AI writing scoring (optional, ADR-008)
+
+When `EXPO_PUBLIC_SCORING_API_URL` is set, practice answers to Summarize Written Text, Write
+Essay, Summarize Spoken Text and Write Email go to the `score-writing` Supabase Edge Function
+(`supabase/functions/score-writing/`). It asks a pinned Claude model (`claude-opus-5-5`, structured
+JSON output) to score the judgement traits and write feedback.
+
+- The app keeps the PTE rules: Form comes from the on-device word-count rules, Form 0 or Content 0
+  zeroes the other traits, and every AI score is clamped to its maximum in `src/core/exams`
+  (`mergeAiScore` in `src/core/scoring/ai.ts`).
+- Offline, a 20-second timeout, a non-2xx reply or a malformed reply falls back to the on-device
+  scorer, with a note in the feedback (`src/services/ai-scoring.ts`).
+- Mock tests still score on the device.
+- Release gate: `npm run calibrate:writing -- <file.jsonl>` compares AI scores with at least 100
+  human-rated responses (MAE, bias, exact and within-1 agreement per trait).
+
 ## From items to a 10–90 estimate
 
 `src/core/progress/estimate.ts`: each task type's recent performance (recency-weighted) is

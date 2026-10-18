@@ -4,6 +4,7 @@ export * from './content/types';
 export * from './content/audio-script';
 export * from './content/validate';
 export * from './scoring';
+export * from './scoring/ai';
 export * from './srs/sm2';
 export * from './progress/estimate';
 export * from './progress/records';

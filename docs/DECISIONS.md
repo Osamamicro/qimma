@@ -202,3 +202,13 @@ Council input: `docs/council/*.md`, round 2.
 **Consequences.** The merge rules are a pure function in `src/core`, unit-tested now and
 reused by v0.3 sync. Bookmarks removed on one device can come back after a merge, which is
 accepted.
+
+### ADR-008 — build notes (2026-10-18)
+
+Built writing-first as decided: Supabase Edge Function `score-writing` with `claude-opus-5-5`
+(pinned, structured JSON output, server-side refusal fallback). The function scores only the
+judgement traits. The app applies Form, the PTE gating and the trait maxima, so exam facts stay in
+`src/core/exams`. The client timeout is 20 s rather than the council's 8 s, because an essay graded
+with model reasoning takes longer. Mock tests keep on-device scoring for now. Known ceiling: the
+endpoint is protected only by the public publishable key plus input-size caps, until v0.3 adds
+anonymous auth and per-user rate limits.
