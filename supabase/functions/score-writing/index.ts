@@ -58,6 +58,8 @@ Deno.serve(async (req) => {
     return json(200, { ...reply, model: message.model });
   } catch (error) {
     if (error instanceof Anthropic.RateLimitError) return json(429, { error: 'Scoring is busy; try again shortly.' });
+    // Logged server-side only; the reply stays generic.
+    console.error('score-writing failed:', error instanceof Error ? `${error.name}: ${error.message}` : error);
     if (error instanceof Anthropic.APIError) return json(502, { error: `Model API error ${error.status ?? ''}`.trim() });
     return json(500, { error: 'Unexpected scoring error.' });
   }
