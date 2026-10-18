@@ -4,7 +4,7 @@ import { itemsOfType } from '@/content';
 import { AI_SCORED_NOTE, aiScoreRequest, isAiWritingItem, mergeAiScore, scoreItem, wordCount, type AiScoreReply } from '@/core';
 import { FALLBACK_NOTE, scoreResponse, type AiScoringConfig } from '@/services/ai-scoring';
 
-import { validateRequest, outputSchema, parseReply, buildUserMessage } from '../../../supabase/functions/score-writing/rubric';
+import { validateRequest, replyFormat, parseReply, buildUserMessage } from '../../../supabase/functions/score-writing/rubric';
 
 const essay = itemsOfType('write-essay')[0];
 const email = itemsOfType('write-email')[0];
@@ -100,6 +100,23 @@ describe('scoreResponse (service with fallback)', () => {
     expect(result.feedback[0]).toBe(FALLBACK_NOTE);
   });
 
+  it('local mode calls Ollama /api/chat with thinking off and a JSON-schema format', async () => {
+    const ollama = vi.fn(() => Promise.resolve(new Response(JSON.stringify({ message: { content: JSON.stringify(reply) } }), { status: 200 })));
+    const result = await scoreResponse(essay, { kind: 'text', text: essayText }, { localUrl: 'http://localhost:11434/', localModel: 'qwen3:8b', fetch: ollama, timeoutMs: 50 });
+    const [url, init] = ollama.mock.calls[0] as unknown as [string, RequestInit];
+    const body = JSON.parse(init.body as string);
+    expect(url).toBe('http://localhost:11434/api/chat');
+    expect(body).toMatchObject({ model: 'qwen3:8b', stream: false, think: false });
+    expect(body.format.properties.scores.required).toContain('content');
+    expect(result.feedback[0]).toBe(AI_SCORED_NOTE);
+  });
+
+  it('local mode falls back when Ollama is not running', async () => {
+    const down = vi.fn(() => Promise.reject(new TypeError('connection refused')));
+    const result = await scoreResponse(essay, { kind: 'text', text: essayText }, { localUrl: 'http://localhost:11434', fetch: down, timeoutMs: 50 });
+    expect(result.feedback[0]).toBe(FALLBACK_NOTE);
+  });
+
   it('does not call the service when no URL is set or the task is not writing', async () => {
     const fetchImpl = vi.fn(ok);
     await scoreResponse(essay, { kind: 'text', text: essayText }, config(fetchImpl, ''));
@@ -119,9 +136,15 @@ describe('score-writing rubric (Edge Function)', () => {
     expect(validateRequest({ ...req, keyPoints: Array(20).fill('k') })).toMatch(/keyPoints/);
   });
 
-  it('builds a schema that requires every trait', () => {
-    const schema = outputSchema(req.traits);
-    expect(schema.properties.scores.required).toEqual(req.traits.map((t) => t.id));
+  it('spells out a JSON reply format that names every trait and its range', () => {
+    const format = replyFormat(req.traits);
+    for (const t of req.traits) expect(format).toContain(`"${t.id}": <integer 0-${t.max}>`);
+  });
+
+  it('parses JSON wrapped in a code fence or a sentence', () => {
+    const body = JSON.stringify({ scores: fullScores, feedback: ['ok'] });
+    expect(parseReply('```json\n' + body + '\n```', req.traits)?.scores.content).toBe(6);
+    expect(parseReply('Here is the score: ' + body, req.traits)?.feedback).toEqual(['ok']);
   });
 
   it('fences the learner text so it is read as data', () => {

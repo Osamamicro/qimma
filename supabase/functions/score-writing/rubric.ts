@@ -1,5 +1,5 @@
 /*
- * Pure request validation, prompt and output schema for the score-writing function (ADR-008).
+ * Pure request validation, prompt and reply format for the score-writing function (ADR-008, ADR-014).
  * No Deno or npm imports, so Vitest can test it from the app repo.
  *
  * The app sends the trait list (ids, labels, maxima) from src/core/exams, so exam facts stay in
@@ -118,7 +118,18 @@ export function buildUserMessage(req: ScoreRequest): string {
     .join('\n\n');
 }
 
-/** JSON schema for structured output: one integer per trait, plus feedback sentences. */
+/**
+ * The exact JSON shape the model must return. Open-weight models behind OpenAI-compatible APIs
+ * support JSON mode far more widely than strict schemas, so the shape is spelled out here and
+ * enforced afterwards by parseReply.
+ */
+export function replyFormat(traits: TraitRef[]): string {
+  const scores = traits.map((t) => `"${t.id}": <integer 0-${t.max}>`).join(', ');
+  return `Reply with one JSON object and nothing else, exactly in this shape:
+{"scores": {${scores}}, "feedback": ["<sentence>", "<sentence>"]}`;
+}
+
+/** JSON schema for runtimes with real structured output (Ollama `format`, vLLM guided JSON). */
 export function outputSchema(traits: TraitRef[]) {
   return {
     type: 'object',
@@ -127,20 +138,22 @@ export function outputSchema(traits: TraitRef[]) {
         type: 'object',
         properties: Object.fromEntries(traits.map((t) => [t.id, { type: 'integer' }])),
         required: traits.map((t) => t.id),
-        additionalProperties: false,
       },
       feedback: { type: 'array', items: { type: 'string' } },
     },
     required: ['scores', 'feedback'],
-    additionalProperties: false,
   };
 }
 
 /** Checks the model's JSON against the requested traits; clamping is left to the app. */
 export function parseReply(text: string, traits: TraitRef[]): ScoreReply | null {
+  // Tolerate code fences or a sentence around the object: some open models add them even in JSON mode.
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start < 0 || end <= start) return null;
   let raw: unknown;
   try {
-    raw = JSON.parse(text);
+    raw = JSON.parse(text.slice(start, end + 1));
   } catch {
     return null;
   }

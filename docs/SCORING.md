@@ -45,16 +45,24 @@ Needs a transcript (web: browser speech recognition).
 
 ## AI writing scoring (optional, ADR-008)
 
-When `EXPO_PUBLIC_SCORING_API_URL` is set, practice answers to Summarize Written Text, Write
-Essay, Summarize Spoken Text and Write Email go to the `score-writing` Supabase Edge Function
-(`supabase/functions/score-writing/`). It asks a pinned Claude model (`claude-opus-5-5`, structured
-JSON output) to score the judgement traits and write feedback.
+Practice answers to Summarize Written Text, Write Essay, Summarize Spoken Text and Write Email can
+be scored by an open-weight model (ADR-014), which scores the judgement traits and writes feedback:
+
+- **Local** (`EXPO_PUBLIC_LOCAL_LLM_URL`, e.g. `http://localhost:11434`): the app calls Ollama's
+  `/api/chat` itself with thinking off and a JSON-schema `format`. Measured on the owner's laptop
+  (i7-12700H, no GPU) with `qwen3:8b`: about 35-45 s per essay; a strong essay scored 26/26, a weak
+  one 13/26. Nothing leaves the machine.
+- **Hosted** (`EXPO_PUBLIC_SCORING_API_URL`): the `score-writing` Supabase Edge Function calls any
+  OpenAI-compatible provider (Groq, OpenRouter, Together, Hugging Face, vLLM) chosen by its
+  `LLM_BASE_URL`, `LLM_MODEL` and `LLM_API_KEY` secrets. Without a key it answers 503 and the app
+  scores on the device.
+- Prompt, reply format and validation are shared: `supabase/functions/score-writing/rubric.ts`.
 
 - The app keeps the PTE rules: Form comes from the on-device word-count rules, Form 0 or Content 0
   zeroes the other traits, and every AI score is clamped to its maximum in `src/core/exams`
   (`mergeAiScore` in `src/core/scoring/ai.ts`).
-- Offline, a 20-second timeout, a non-2xx reply or a malformed reply falls back to the on-device
-  scorer, with a note in the feedback (`src/services/ai-scoring.ts`).
+- Offline, a timeout (90 s local, 20 s hosted), a non-2xx reply or a malformed reply falls back to
+  the on-device scorer, with a note in the feedback (`src/services/ai-scoring.ts`).
 - Mock tests still score on the device.
 - Release gate: `npm run calibrate:writing -- <file.jsonl>` compares AI scores with at least 100
   human-rated responses (MAE, bias, exact and within-1 agreement per trait).
