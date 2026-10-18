@@ -191,9 +191,10 @@ Council input: `docs/council/*.md`, round 2.
     The orchestrator sided with pedagogy.
 - **Files rather than share text.** On native, the export is written as a file and shared,
   and import uses a document picker. A share-sheet text message can exceed Android's ~1 MB
-  intent limit once 50 mock reports are stored. `expo-file-system`, `expo-sharing` and
-  `expo-document-picker` are all "Included in Expo Go" per the SDK 58 docs, so no development
-  build is needed. The web uses a Blob download and a file input.
+  intent limit once 50 mock reports are stored. `expo-file-system` and `expo-sharing` are
+  "Included in Expo Go" per the SDK 58 docs, so no development build is needed. Import uses
+  `File.pickFileAsync()` from expo-file-system: in Expo Go, a URI from `expo-document-picker`
+  cannot be read with the new `File` API (it fails with "Missing 'READ' permission"). The web uses a Blob download and a file input.
 - **Format.** `{ app: 'qimma', version: 1, exportedAt, data: { settings, attempts, vocab,
   bookmarks, mocks } }`. Newer versions are rejected, older ones migrated, and malformed
   entries dropped and counted.

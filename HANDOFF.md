@@ -32,8 +32,8 @@ Australian Home Affairs scale, R69 L70 S88 W85 on PTE Academic.
 microphone/text-to-speech behaviour on a device. The original sandbox had no KVM and no `pwsh`.
 
 **Last check (2026-10-18, owner's Windows PC):** `npm run check` (tsc clean, 259/259) and the
-web build are green. Item 2 (backup) is built and was exercised in the browser: export, import
-with merge preview, and the storage-failure banner. Its emulator check waits on item 1.
+web build are green. Item 2 (backup) works in the browser (export, import with merge preview,
+storage-failure banner) and in the Android emulator (share-sheet export, file-picker import).
 
 ## 3. First 10 minutes
 
@@ -99,11 +99,9 @@ Each item lists *done when*.
    what breaks: SDK paths, AVD flags, the Expo Go version. Start with the risk list in
    `docs/LOCAL-PC.md` §3. *Done when* the app opens in the
    emulator, a Repeat Sentence item plays audio, and the microphone records.
-2. **Progress export/import (ADR-006, decided in ADR-013). Built; web verified.** Remaining: run
-   Export and Import once in the emulator (needs item 1). Code: `src/core/backup/`,
-   `src/services/backup-file{,.web}.ts`, `src/features/backup/`. Original scope: a JSON export/import of settings, attempts, SRS and
-   mocks in Settings, with a schema `version` field and a storage-full warning. *Done when* a
-   round-trip test passes and the UI works on web and in the emulator.
+2. **Progress export/import (ADR-006, decided in ADR-013). Done 2026-10-18,** verified on the web
+   and in the Android emulator (share sheet export, file-picker import with merge preview). Code:
+   `src/core/backup/`, `src/services/backup-file{,.web}.ts`, `src/features/backup/`.
 3. **AI scoring service, writing first (ADR-008).** A Supabase Edge Function (TypeScript) that
    takes `{ item, response }` and returns `ScoreResult`, grading against the trait rubric with
    a pinned Claude model. Keys live only in function secrets, never in `EXPO_PUBLIC_*`. The app

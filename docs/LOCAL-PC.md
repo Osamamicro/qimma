@@ -77,7 +77,7 @@ These came from reading the scripts. **None of them has been confirmed on Window
   repo to a short path such as `C:\dev\qimma`. A synced Desktop can make `npm install` fail
   with `EPERM`.
 
-## 4. Backlog item 2: progress export/import, decided in ADR-013 (built; emulator check pending)
+## 4. Backlog item 2: progress export/import, decided in ADR-013 (done 2026-10-18)
 
 - **Pure core** (new `src/core/backup/`):
   - The format is `{ app: 'qimma', version: 1, exportedAt, data: { settings, attempts, vocab,
@@ -106,14 +106,16 @@ These came from reading the scripts. **None of them has been confirmed on Window
 - **App state** (`src/services/app-state.ts`): add `exportBackup()` and `importBackup(data)`,
   which merges, writes every store and returns whether all the writes succeeded.
 - **Files:**
-  - Install with `npx expo install expo-file-system expo-sharing expo-document-picker`. All
-    three are in Expo Go per the SDK 58 docs.
+  - Install with `npx expo install expo-file-system expo-sharing`. Both are in Expo Go per the
+    SDK 58 docs.
   - Native code goes in `src/services/backup-file.ts`: write to `Paths.cache` with `File`,
     then `Sharing.shareAsync(uri, { mimeType: 'application/json' })`. Import uses
-    `DocumentPicker.getDocumentAsync`, then `new File(uri).text()`.
+    `File.pickFileAsync()`, then `.text()` on the result. (Built that way: reading a
+    `DocumentPicker` URI with `new File(uri).text()` is rejected in Expo Go with "Missing 'READ'
+    permission", so `expo-document-picker` was dropped.)
   - Web code goes in `src/services/backup-file.web.ts`: a Blob plus an anchor download, and a
     hidden `<input type=file>`.
-  - Check the exact APIs on docs.expo.dev/versions/v58.0.0/sdk/{filesystem,sharing,document-picker}.
+  - Check the exact APIs on docs.expo.dev/versions/v58.0.0/sdk/{filesystem,sharing}.
 - **UI:**
   - A backup card in Settings: Export, Import (preview, then confirm), "Last backup: date or
     never", and the size.

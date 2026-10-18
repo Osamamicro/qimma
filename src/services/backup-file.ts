@@ -1,4 +1,3 @@
-import * as DocumentPicker from 'expo-document-picker';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
@@ -14,9 +13,13 @@ export async function saveBackupFile(name: string, text: string): Promise<void> 
   await Sharing.shareAsync(file.uri, { mimeType: 'application/json', dialogTitle: 'Save Qimma backup', UTI: 'public.json' });
 }
 
-/** Returns the picked file's text, or null when the learner cancels. */
+/**
+ * Returns the picked file's text, or null when the learner cancels. Uses the file-system picker,
+ * which grants read access to the picked file; a document-picker URI read with `new File(uri)`
+ * is rejected in Expo Go ("Missing 'READ' permission").
+ */
 export async function pickBackupFile(): Promise<string | null> {
-  const result = await DocumentPicker.getDocumentAsync({ type: ['application/json', 'text/plain', '*/*'], copyToCacheDirectory: true });
-  if (result.canceled) return null;
-  return new File(result.assets[0].uri).text();
+  const picked = await File.pickFileAsync({ mimeTypes: ['application/json', 'text/plain', '*/*'] });
+  if (picked.canceled) return null;
+  return picked.result.text();
 }
