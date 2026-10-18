@@ -16,6 +16,7 @@ import { SYSTEM_PROMPT, buildUserMessage, outputSchema, parseReply, replyFormat 
  */
 
 export const FALLBACK_NOTE = 'AI scoring was unavailable, so this is the on-device estimate.';
+export const CANCELLED_NOTE = 'AI scoring was cancelled, so this is the on-device estimate.';
 const HOSTED_TIMEOUT_MS = 20_000;
 // A local 8B model on a laptop CPU took ~35 s for an essay; allow headroom for a cold start.
 const LOCAL_TIMEOUT_MS = 90_000;
@@ -91,8 +92,11 @@ async function hostedReply(config: AiScoringConfig, request: ReturnType<typeof a
   return reply;
 }
 
-/** Scores any response; writing tasks go to the AI scorer when one is configured. */
-export async function scoreResponse(item: Item, response: Response, config = defaultConfig()): Promise<ScoreResult> {
+/**
+ * Scores any response; writing tasks go to the AI scorer when one is configured. Aborting
+ * `cancel` (the learner chose not to wait) returns the on-device score at once.
+ */
+export async function scoreResponse(item: Item, response: Response, config = defaultConfig(), cancel?: AbortSignal): Promise<ScoreResult> {
   if (!aiScoringEnabled(config) || !isAiWritingItem(item) || response.kind !== 'text') return scoreItem(item, response);
   // Form 0 (empty or far off length) zeroes every trait in PTE, so the AI could not change the score.
   const onDevice = scoreItem(item, response);
@@ -101,13 +105,16 @@ export async function scoreResponse(item: Item, response: Response, config = def
   const local = Boolean(config.localUrl);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), config.timeoutMs ?? (local ? LOCAL_TIMEOUT_MS : HOSTED_TIMEOUT_MS));
+  const onCancel = () => controller.abort();
+  cancel?.addEventListener('abort', onCancel);
   try {
     const request = aiScoreRequest(item, response.text);
     const reply = await (local ? localReply : hostedReply)(config, request, controller.signal);
     return mergeAiScore(item, response.text, reply);
   } catch {
-    return { ...onDevice, feedback: [FALLBACK_NOTE, ...onDevice.feedback] };
+    return { ...onDevice, feedback: [cancel?.aborted ? CANCELLED_NOTE : FALLBACK_NOTE, ...onDevice.feedback] };
   } finally {
     clearTimeout(timer);
+    cancel?.removeEventListener('abort', onCancel);
   }
 }

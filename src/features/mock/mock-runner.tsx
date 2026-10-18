@@ -1,5 +1,5 @@
 import { router, Stack } from 'expo-router';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, View } from 'react-native';
 
 import { Button, Card, Chip, ProgressBar, Row, Screen, Stat, Text } from '@/components/ui';
@@ -58,6 +58,19 @@ export function MockRunner({ kind }: { kind: MockKind }) {
   const draftRef = useRef<Response | null>(null);
   const resultsRef = useRef<MockResultItem[]>([]);
   const finishedRef = useRef(false);
+
+  // Web only: a refresh or closed tab would discard the paper in progress (submitted answers still
+  // count as attempts), so the browser asks first. Native has no refresh; Quit has its own confirm.
+  useEffect(() => {
+    if (process.env.EXPO_OS !== 'web' || !started) return;
+    const warn = (e: BeforeUnloadEvent) => {
+      if (finishedRef.current) return;
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [started]);
 
   if (slots.length === 0) {
     return (

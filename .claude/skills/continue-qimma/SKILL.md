@@ -12,7 +12,7 @@ description: Resume development of the Qimma English-exam app after cloning. Use
    - `npm install`
    - `npx expo start --web --port 8099` for about 30 seconds, then stop it. This generates
      `.expo/types` for typed routes.
-   - `npm run check`. Report the result: typecheck plus about 259 tests.
+   - `npm run check`. Report the result: typecheck plus about 284 tests.
 4. Tell the owner in a few lines what state you found and which backlog item (HANDOFF §6)
    you will take next. Ask only if a decision in HANDOFF §7 blocks that item.
 5. Work the item with the team workflow (`docs/TEAM.md`):
