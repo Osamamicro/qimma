@@ -101,7 +101,9 @@ export function RecordPanel({ prepSec, responseSec, mode, ready = true, autoStar
           {mode === 'mock' && capture.error ? <Button label="Skip question" variant="secondary" onPress={skip} /> : null}
           {!capture.recognitionSupported && (
             <Text variant="small" tone="faint">
-              Automatic speech scoring runs in the web app on Chrome or Edge. Here you can record, listen back and self-rate.
+              {capture.transcriptionAvailable
+                ? 'Your recording is transcribed on your computer and scored for content. Fluency and pronunciation are not estimated on phones yet.'
+                : 'Automatic speech scoring runs in the web app on Chrome or Edge. Here you can record, listen back and self-rate.'}
             </Text>
           )}
         </View>
@@ -136,7 +138,11 @@ export function RecordPanel({ prepSec, responseSec, mode, ready = true, autoStar
         </View>
       )}
 
-      {phase === 'processing' && <Text tone="muted">Processing your answer…</Text>}
+      {phase === 'processing' && (
+        <Text tone="muted" accessibilityLiveRegion="polite">
+          {!capture.recognitionSupported && capture.transcriptionAvailable ? 'Transcribing your answer…' : 'Processing your answer…'}
+        </Text>
+      )}
 
       {(phase === 'rate' || phase === 'done') && response && (
         <View style={{ gap: 12 }}>

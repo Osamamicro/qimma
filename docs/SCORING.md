@@ -40,8 +40,11 @@ Needs a transcript (web: browser speech recognition).
   politeness/appropriacy markers once the answer is on topic.
 - **Fluency**: speaking rate (110–170 wpm best), hesitations, repetitions, use of the window.
 - **Pronunciation**: recogniser confidence blended with recognition rate (a proxy, not phonetics).
-- No transcript (Expo Go on phones): the learner self-rates content; fluency and pronunciation
-  are shown as "—" rather than invented.
+- Phones with the local Whisper server (ADR-015): the recording is transcribed on the PC and
+  scored for **content only**; fluency and pronunciation show "not scored", because those
+  heuristics were tuned on browser-recogniser output and are not calibrated for Whisper.
+- No transcript (Expo Go on phones without the server, or when it fails): the learner self-rates
+  content; fluency and pronunciation are shown as "—" rather than invented.
 
 ## AI writing scoring (optional, ADR-008)
 

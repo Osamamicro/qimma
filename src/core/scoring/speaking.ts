@@ -72,6 +72,12 @@ function noTranscript(taskType: TaskTypeId, response: SpeechResponse, answer?: s
   return build(taskType, values, feedback, answer, response.selfRating == null ? spec.traits.map((t) => t.id) : unscored);
 }
 
+/** ADR-004: transcripts of phone recordings score content only, not fluency or pronunciation. */
+const PHONE_NOTE = 'Fluency and pronunciation are not estimated from phone recordings yet; content is scored from a transcript of your recording.';
+function phoneOnly(response: SpeechResponse): TraitId[] {
+  return response.transcriptSource === 'whisper' ? ['fluency', 'pronunciation'] : [];
+}
+
 /** Read Aloud (content 0..5) and Repeat Sentence (content 0..3): reference alignment. */
 export function scoreReferenceSpeech(
   taskType: 'read-aloud' | 'repeat-sentence',
@@ -106,7 +112,8 @@ export function scoreReferenceSpeech(
     values.fluency = 0;
     values.pronunciation = 0;
   }
-  return build(taskType, values, feedback, answer);
+  if (response.transcriptSource === 'whisper') feedback.push(PHONE_NOTE);
+  return build(taskType, values, feedback, answer, phoneOnly(response));
 }
 
 const POLITE_MARKERS = ['please', 'could you', 'would you', 'would it be', 'i was wondering', 'sorry', 'apologise', 'apologize', 'thank', 'appreciate', 'excuse me', 'i understand'];
@@ -148,7 +155,8 @@ export function scoreOpenSpeech(
     values.fluency = 0;
     values.pronunciation = 0;
   }
-  return build(taskType, values, feedback, modelAnswer);
+  if (response.transcriptSource === 'whisper') feedback.push(PHONE_NOTE);
+  return build(taskType, values, feedback, modelAnswer, phoneOnly(response));
 }
 
 /** Answer Short Question: 1 if any accepted answer is said. */

@@ -8,10 +8,13 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 
 import type { SpeechResponse } from '@/core';
 import { createRecognizer } from '@/services/speech-recognition';
+import { transcribeRecording, transcriptionEnabled } from '@/services/speech-to-text';
 
 /**
  * Records the microphone (for playback) and, where available, runs speech
- * recognition in parallel (for scoring). Returns a SpeechResponse on stop.
+ * recognition in parallel (for scoring). Where there is no live recogniser (phones),
+ * the recording is transcribed by the local Whisper server when one is configured
+ * (ADR-015). Returns a SpeechResponse on stop.
  */
 export function useSpeechCapture() {
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
@@ -67,13 +70,19 @@ export function useSpeechCapture() {
     } catch {
       // ignore
     }
+    const audioUri = audioOk.current ? recorder.uri : null;
+    if (recognised) {
+      return { kind: 'speech', transcript: recognised.transcript, confidence: recognised.confidence ?? null, transcriptSource: 'browser', durationMs, audioUri };
+    }
+    const whisper = audioUri ? await transcribeRecording(audioUri) : null;
     return {
       kind: 'speech',
-      // null = no usable recogniser this time (unsupported or failed): the panel asks for self-review.
-      transcript: recognised ? recognised.transcript : null,
-      confidence: recognised?.confidence ?? null,
+      // null = no transcript this time (no recogniser, no server, or it failed): the panel asks for self-review.
+      transcript: whisper ? whisper.transcript : null,
+      confidence: whisper?.confidence ?? null,
+      transcriptSource: whisper ? 'whisper' : undefined,
       durationMs,
-      audioUri: audioOk.current ? recorder.uri : null,
+      audioUri,
     };
   }, [recorder, recognizer]);
 
@@ -83,5 +92,5 @@ export function useSpeechCapture() {
     if (audioOk.current) recorder.stop().catch(() => undefined);
   }, [recorder, recognizer]);
 
-  return { start, stop, cancel, recording, live, error, recognitionSupported: recognizer.supported };
+  return { start, stop, cancel, recording, live, error, recognitionSupported: recognizer.supported, transcriptionAvailable: transcriptionEnabled() };
 }

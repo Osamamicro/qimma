@@ -200,3 +200,27 @@ describe('open speech (key-point coverage)', () => {
     expect(r.answer).toBe('model');
   });
 });
+
+describe('Whisper transcripts from phone recordings (ADR-004, ADR-015)', () => {
+  it('scores content but leaves fluency and pronunciation unscored', () => {
+    const r = scoreReferenceSpeech('read-aloud', RA_TEXT, speech('The quick brown fox jumps over the lazy dog', 30000, { transcriptSource: 'whisper', confidence: 0.9 }));
+    expect(trait(r, 'content').score).toBe(5);
+    expect(trait(r, 'fluency').unscored).toBe(true);
+    expect(trait(r, 'pronunciation').unscored).toBe(true);
+    expect(r.max).toBe(trait(r, 'content').max);
+    expect(r.feedback.some((f) => f.includes('phone recordings'))).toBe(true);
+  });
+
+  it('applies the same rule to open tasks', () => {
+    const points: KeyPoint[] = [{ label: 'Trend', keywords: ['increase'] }];
+    const r = scoreOpenSpeech('describe-image', points, 'model', speech('the chart shows an increase over time', 30000, { transcriptSource: 'whisper' }));
+    expect(trait(r, 'fluency').unscored).toBe(true);
+    expect(trait(r, 'pronunciation').unscored).toBe(true);
+    expect(trait(r, 'content').unscored).toBeUndefined();
+  });
+
+  it('keeps browser transcripts fully scored', () => {
+    const r = scoreReferenceSpeech('read-aloud', RA_TEXT, speech('The quick brown fox jumps over the lazy dog', 30000, { transcriptSource: 'browser' }));
+    expect(trait(r, 'fluency').unscored).toBeUndefined();
+  });
+});

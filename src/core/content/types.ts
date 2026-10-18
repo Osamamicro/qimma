@@ -279,6 +279,12 @@ export interface SpeechResponse {
   transcript: string | null;
   /** Recording length; 0 means nothing was recorded (skipped), which scores 0 across all traits. */
   durationMs: number;
+  /**
+   * Where the transcript came from: the browser's live recogniser, or a Whisper transcription of
+   * the recording (phones, ADR-015). Whisper transcripts score content only until fluency and
+   * pronunciation are calibrated for them (ADR-004).
+   */
+  transcriptSource?: 'browser' | 'whisper';
   /** Mean recogniser confidence 0..1 when the engine reports it. */
   confidence?: number | null;
   audioUri?: string | null;
