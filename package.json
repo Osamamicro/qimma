@@ -37,6 +37,8 @@
   },
   "devDependencies": {
     "@types/react": "~19.3.0",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~58.0.4",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "vitest": "^3.2.7"
@@ -51,7 +53,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "expo lint",
-    "check": "npm run typecheck && npm test",
+    "check": "npm run typecheck && npm run lint && npm test",
     "emulator:android": "node scripts/emulator.mjs",
     "calibrate:writing": "tsx scripts/calibrate-writing.ts"
   },

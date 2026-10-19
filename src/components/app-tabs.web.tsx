@@ -3,7 +3,7 @@ import { TabList, TabSlot, TabTrigger, Tabs, type TabTriggerSlotProps } from 'ex
 import { Pressable, useWindowDimensions, View } from 'react-native';
 
 import { Text } from '@/components/ui';
-import { MAX_WIDTH, radius, space, useColors } from '@/theme';
+import { MAX_WIDTH, space, useColors } from '@/theme';
 
 const TABS = [
   { name: 'index', href: '/', label: 'Today' },

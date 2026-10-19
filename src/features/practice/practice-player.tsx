@@ -6,13 +6,12 @@ import { getTaskType, type Item, type Response, type ScoreResult } from '@/core'
 import { scoreResponse } from '@/services/ai-scoring';
 import { recordAttempt } from '@/services/app-state';
 
-import { rendererFor } from './renderers';
+import { ItemRenderer } from './renderers';
 import { ScoreCard } from './shared';
 
 /** Practice flow for one item: render → submit → score → feedback → retry/next. */
 export function PracticePlayer({ item, onNext }: { item: Item; onNext?: () => void }) {
   const spec = getTaskType(item.type);
-  const Renderer = rendererFor(item);
   const [round, setRound] = useState(0);
   const [result, setResult] = useState<ScoreResult | null>(null);
   const [scoring, setScoring] = useState(false);
@@ -42,7 +41,7 @@ export function PracticePlayer({ item, onNext }: { item: Item; onNext?: () => vo
         <Text variant="heading">{item.title}</Text>
         <Text tone="muted">{spec.instructions}</Text>
       </View>
-      <Renderer key={`${item.id}-${round}`} item={item} mode="practice" onSubmit={submit} result={result} />
+      <ItemRenderer key={`${item.id}-${round}`} item={item} mode="practice" onSubmit={submit} result={result} />
       {scoring && (
         <Row style={{ justifyContent: 'space-between' }}>
           <Text tone="muted" accessibilityLiveRegion="polite">

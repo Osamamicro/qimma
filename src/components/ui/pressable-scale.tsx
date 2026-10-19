@@ -28,12 +28,12 @@ export function PressableScale({ pressedScale = 0.97, onPressIn, onPressOut, sty
       {...rest}
       onPressIn={(e) => {
         setPressed(true);
-        if (!reduce) scale.value = withTiming(pressedScale, { duration: motion.fast, easing: OUT });
+        if (!reduce) scale.set(withTiming(pressedScale, { duration: motion.fast, easing: OUT }));
         onPressIn?.(e);
       }}
       onPressOut={(e) => {
         setPressed(false);
-        if (!reduce) scale.value = withTiming(1, { duration: motion.base, easing: OUT });
+        if (!reduce) scale.set(withTiming(1, { duration: motion.base, easing: OUT }));
         onPressOut?.(e);
       }}
       style={[resolved, animated]}
