@@ -22,6 +22,7 @@ const GRADE_VARIANT: Record<Grade, 'danger' | 'secondary' | 'primary'> = {
 export function ReviewSession({ mode }: { mode: ReviewMode }) {
   const cards = vocabStore.useValue();
   const [queue] = useState(() => buildReviewQueue(vocabEntries, vocabStore.get(), Date.now(), mode));
+  const [now] = useState(Date.now);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [tally, setTally] = useState<Record<Grade, number>>({ again: 0, hard: 0, good: 0, easy: 0 });
@@ -66,7 +67,7 @@ export function ReviewSession({ mode }: { mode: ReviewMode }) {
   }
 
   const entry: VocabEntry = queue.entries[index];
-  const intervals = previewIntervals(cards[entry.id], Date.now());
+  const intervals = previewIntervals(cards[entry.id], now);
 
   const grade = (g: Grade) => {
     // Guards against a double tap grading the same card twice.

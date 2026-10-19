@@ -19,9 +19,9 @@ export const speakingVisualItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['class size', 'class sizes', 'pupils', 'primary school', 'primary schools', 'regions'] },
-      { label: 'Largest classes', keywords: ['east', '27', 'twenty-seven', 'highest', 'largest', 'biggest'] },
-      { label: 'Smallest classes', keywords: ['west', '19', 'nineteen', 'lowest', 'smallest', 'least'] },
-      { label: 'Middle regions', keywords: ['north', 'south', 'central', '24', '21', '22', 'between', 'average'] },
+      { label: 'Largest classes', keywords: ['east', '27', 'twenty-seven'], sameSentence: ['largest', 'highest', 'biggest', 'most'] },
+      { label: 'Smallest classes', keywords: ['west', '19', 'nineteen'], sameSentence: ['smallest', 'lowest', 'least'] },
+      { label: 'Middle regions', keywords: ['north', 'south', 'central', '24', '21', '22', 'average'], sameSentence: ['between'] },
       { label: 'Conclusion', keywords: ['eight pupils', 'difference', 'gap', 'four of the five', 'staffing', 'overall'] },
     ],
     modelAnswer:
@@ -46,9 +46,9 @@ export const speakingVisualItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['electricity', 'generation', 'power', 'energy', 'wind', 'hydro'] },
-      { label: 'Wind decline', keywords: ['wind', 'falls', 'fell', 'decline', 'declined', 'decreased', 'drops', '310', '190'] },
-      { label: 'Hydro increase', keywords: ['hydro', 'rises', 'rise', 'rising', 'increase', 'increased', 'grows', '250', '400'] },
-      { label: 'Crossover point', keywords: ['march', 'overtook', 'overtakes', 'overtake', 'crossover', 'cross', 'lead'] },
+      { label: 'Wind decline', keywords: ['wind', '310', '190'], sameSentence: ['falls', 'fell', 'decline', 'declined', 'decreased', 'drops'] },
+      { label: 'Hydro increase', keywords: ['hydro', '250', '400'], sameSentence: ['rises', 'rise', 'rising', 'increase', 'increased', 'grows'] },
+      { label: 'Crossover point', keywords: ['march', 'crossover', 'cross'], sameSentence: ['overtook', 'overtakes', 'overtake', 'lead', 'ahead'] },
       { label: 'Conclusion', keywords: ['june', 'swap', 'switch', 'relies more', 'depend', 'rely', 'overall'] },
     ],
     modelAnswer:
@@ -74,9 +74,9 @@ export const speakingVisualItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['budget', 'spending', 'municipal', 'city', 'council', 'services'] },
-      { label: 'Largest share', keywords: ['roads', 'road', 'road maintenance', '28', 'largest', 'biggest'] },
-      { label: 'Second largest', keywords: ['public transit', 'transit', '19', 'second', 'second biggest'] },
-      { label: 'Smallest share', keywords: ['libraries', 'library', '8', 'eight', 'smallest', 'least'] },
+      { label: 'Largest share', keywords: ['roads', 'road', 'road maintenance', '28'], sameSentence: ['largest', 'biggest', 'most', 'highest'] },
+      { label: 'Second largest', keywords: ['public transit', 'transit', '19'], sameSentence: ['second'] },
+      { label: 'Smallest share', keywords: ['libraries', 'library', '8', 'eight'], sameSentence: ['smallest', 'least', 'lowest'] },
       { label: 'Combined transport share', keywords: ['47', 'forty-seven', 'nearly half', 'together', 'transport', 'transportation'] },
     ],
     modelAnswer:
@@ -99,9 +99,9 @@ export const speakingVisualItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['laptop', 'laptops', 'models', 'compare', 'comparison', 'specifications', 'students'] },
-      { label: 'Cheapest model', keywords: ['atlas 14', 'atlas', '849', 'cheapest', 'lowest price', 'least expensive'] },
-      { label: 'Longest battery', keywords: ['lumen 13', 'lumen', 'battery', '14 hours', 'fourteen', 'longest'] },
-      { label: 'Heaviest model', keywords: ['nimbus 15', 'nimbus', 'heaviest', '2.2', 'heavy', 'weight'] },
+      { label: 'Cheapest model', keywords: ['atlas 14', 'atlas', '849'], sameSentence: ['cheapest', 'lowest price', 'least expensive'] },
+      { label: 'Longest battery', keywords: ['lumen 13', 'lumen', 'battery', '14 hours', 'fourteen'], sameSentence: ['longest'] },
+      { label: 'Heaviest model', keywords: ['nimbus 15', 'nimbus', '2.2'], sameSentence: ['heaviest', 'heavy', 'weight'] },
       { label: 'Trade-off', keywords: ['trade-off', 'trade off', 'balance', 'best balance', 'lightest', 'portable', 'overall'] },
     ],
     modelAnswer:
@@ -153,10 +153,10 @@ export const speakingVisualItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['waiting times', 'waiting', 'wait', 'emergency', 'emergency department', 'triage'] },
-      { label: 'Urgent cases', keywords: ['urgent', 'shortest', '10', 'ten', 'lowest', 'quickly', 'very quickly'] },
-      { label: 'Non-urgent cases', keywords: ['non-urgent', 'non urgent', '163', 'longest', 'highest', 'delays'] },
-      { label: 'Third quarter peak', keywords: ['q3', 'third quarter', 'peak', 'highest', 'busiest', 'all three'] },
-      { label: 'Fourth quarter and conclusion', keywords: ['q4', 'fourth quarter', 'fell', 'fall', 'drop', 'decline', 'overall', 'prioritises', 'prioritizes'] },
+      { label: 'Urgent cases', keywords: ['urgent', '10', 'ten'], sameSentence: ['shortest', 'lowest', 'quickly'] },
+      { label: 'Non-urgent cases', keywords: ['non-urgent', 'non urgent', '163', 'delays'], sameSentence: ['longest', 'highest', 'most'] },
+      { label: 'Third quarter peak', keywords: ['q3', 'third quarter', 'all three'], sameSentence: ['peak', 'highest', 'busiest'] },
+      { label: 'Fourth quarter and conclusion', keywords: ['q4', 'fourth quarter', 'overall', 'prioritises', 'prioritizes'], sameSentence: ['fell', 'fall', 'drop', 'decline'] },
     ],
     modelAnswer:
       'This line graph shows average waiting times in an emergency department for three triage levels across four quarters, using illustrative figures. Patients with urgent cases are seen very quickly, with waits of between 10 and 14 minutes throughout the year. Semi-urgent patients wait between 41 and 52 minutes. Non-urgent patients wait the longest, at roughly 140 to 163 minutes. All three lines peak in the third quarter and then fall in the fourth quarter. Overall, the department prioritises urgent cases effectively, but non-urgent patients face long delays at busy times.',
@@ -181,10 +181,10 @@ export const speakingVisualItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['costs', 'cost', 'international students', 'living costs', 'annual', 'cities'] },
-      { label: 'Most expensive city', keywords: ['northgate', 'most expensive', 'highest', '48', 'forty-eight'] },
-      { label: 'Cheapest city', keywords: ['lakeview', 'cheapest', 'least expensive', 'lowest', '33', 'thirty-three'] },
-      { label: 'Tuition', keywords: ['tuition', 'largest cost', 'biggest cost', '28', '18', 'twenty-eight', 'eighteen'] },
-      { label: 'Accommodation and smaller costs', keywords: ['accommodation', 'housing', 'eastmoor', '14', 'fourteen', 'food', 'transport'] },
+      { label: 'Most expensive city', keywords: ['northgate', '48', 'forty-eight'], sameSentence: ['most expensive', 'highest', 'most'] },
+      { label: 'Cheapest city', keywords: ['lakeview', '33', 'thirty-three'], sameSentence: ['cheapest', 'least expensive', 'lowest'] },
+      { label: 'Tuition', keywords: ['tuition', '28', '18', 'twenty-eight', 'eighteen'], sameSentence: ['largest', 'biggest'] },
+      { label: 'Accommodation and smaller costs', keywords: ['accommodation', 'housing', 'eastmoor', '14', 'fourteen', 'food', 'transport'], sameSentence: ['highest', 'smaller', 'smallest'] },
     ],
     modelAnswer:
       'This bar chart compares estimated annual costs for an international student in three cities, using illustrative figures. Tuition is the largest cost in every city, ranging from 18 thousand dollars in Lakeview to 28 thousand in Northgate. Northgate is the most expensive overall, with a total of 48 thousand dollars, while Lakeview is the cheapest, at 33 thousand. Eastmoor has the highest accommodation cost, at 14 thousand. Food and transport are much smaller items in all three cities. Overall, the choice of city can change a student’s total budget by around fifteen thousand dollars.',
@@ -271,8 +271,8 @@ export const speakingVisualItems: Item[] = [
     ],
     keyPoints: [
       { label: 'Topic', keywords: ['library', 'overnight', 'opening', 'open', 'exam period', 'midnight', 'late'] },
-      { label: 'Priya supports it', keywords: ['part-time jobs', 'quiet', 'international students', 'study late', 'shared flats', 'help'] },
-      { label: 'Lucas has concerns', keywords: ['cost', 'costs', 'budget', 'security', 'staff', 'expense', 'few students', 'safety'] },
+      { label: 'Priya supports it', keywords: ['part-time jobs', 'quiet', 'international students', 'study late', 'shared flats', 'help'], speaker: 'Priya' },
+      { label: 'Lucas has concerns', keywords: ['cost', 'costs', 'budget', 'security', 'staff', 'expense', 'few students', 'safety'], speaker: 'Lucas' },
       { label: 'Card access and trial', keywords: ['card access', 'card-access', 'trial', 'patrol', 'survey', 'two exam periods'] },
       { label: 'Conclusion', keywords: ['agree', 'agreed', 'sensible', 'planning', 'compare', 'shared housing'] },
     ],
@@ -333,9 +333,9 @@ export const speakingVisualItems: Item[] = [
     ],
     keyPoints: [
       { label: 'Topic', keywords: ['anonymous marking', 'anonymous', 'anonymously', 'marking', 'essays', 'names hidden'] },
-      { label: 'Ana supports it', keywords: ['fairer', 'fairness', 'bias', 'unconsciously', 'argument', 'evidence', 'focus'] },
-      { label: 'Sam has concerns', keywords: ['seminars', 'feedback', 'personal', 'relationship', 'student number', 'hard to keep', 'tutor'] },
-      { label: 'Pilot and checks', keywords: ['pilot', 'first-year', 'first year', 'second marker', 'sample', 'anonymise', 'anonymize'] },
+      { label: 'Ana supports it', keywords: ['fairer', 'fairness', 'bias', 'unconsciously', 'argument', 'evidence', 'focus'], speaker: 'Ana' },
+      { label: 'Sam has concerns', keywords: ['seminars', 'feedback', 'personal', 'relationship', 'student number', 'hard to keep', 'tutor'], speaker: 'Sam' },
+      { label: 'Pilot and checks', keywords: ['pilot', 'first-year', 'first year', 'second marker', 'sample', 'anonymise', 'anonymize'], speaker: 'Dr Ferreira' },
       { label: 'Conclusion', keywords: ['agree', 'agreed', 'sensible', 'publish', 'published', 'results', 'data'] },
     ],
     modelAnswer:
@@ -395,9 +395,9 @@ export const speakingVisualItems: Item[] = [
     ],
     keyPoints: [
       { label: 'Topic', keywords: ['reading week', 'break', 'term', 'mid-term', 'second reading', 'catch-up'] },
-      { label: 'Jordan supports it', keywords: ['welcome', 'behind', 'catch up', 'rest', 'recover', 'recovery', 'part-time'] },
-      { label: 'Mei has concerns', keywords: ['fewer teaching', 'compressed', 'tutorials', 'contact hours', 'international', 'travel', 'expensive'] },
-      { label: 'Compromise', keywords: ['catch-up week', 'catch up week', 'compromise', 'one reading week', 'final term', 'end of term', 'instead'] },
+      { label: 'Jordan supports it', keywords: ['welcome', 'behind', 'catch up', 'rest', 'recover', 'recovery', 'part-time'], speaker: 'Jordan' },
+      { label: 'Mei has concerns', keywords: ['fewer teaching', 'compressed', 'tutorials', 'contact hours', 'international', 'travel', 'expensive'], speaker: 'Mei' },
+      { label: 'Compromise', keywords: ['catch-up week', 'catch up week', 'compromise', 'one reading week', 'final term', 'end of term', 'instead'], speaker: 'Professor Hart' },
       { label: 'Conclusion', keywords: ['agree', 'agreed', 'calendar', 'balance', 'senate', 'tutorials', 'teaching time'] },
     ],
     modelAnswer:
@@ -457,8 +457,8 @@ export const speakingVisualItems: Item[] = [
     ],
     keyPoints: [
       { label: 'Topic', keywords: ['podcast', 'podcasts', 'recorded', 'audio', 'essay', 'assignment', 'history'] },
-      { label: 'Ibrahim supports it', keywords: ['communication', 'speaking', 'skills', 'listener', 'argument', 'editing', 'employers'] },
-      { label: 'Chloe has concerns', keywords: ['referencing', 'marking', 'marker', 'listen', 'equipment', 'access', 'equity', 'disadvantage'] },
+      { label: 'Ibrahim supports it', keywords: ['communication', 'speaking', 'skills', 'listener', 'argument', 'editing', 'employers'], speaker: 'Ibrahim' },
+      { label: 'Chloe has concerns', keywords: ['referencing', 'marking', 'marker', 'listen', 'equipment', 'access', 'equity', 'disadvantage'], speaker: 'Chloe' },
       { label: 'Proposed safeguards', keywords: ['script', 'show notes', 'rubric', 'timestamps', 'loan', 'studios', 'provide equipment'] },
       { label: 'Conclusion', keywords: ['pilot', 'agree', 'agreed', 'final year', 'choice', 'choosing', 'sensible'] },
     ],

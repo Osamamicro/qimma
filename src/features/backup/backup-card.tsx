@@ -22,6 +22,7 @@ type Status = { tone: 'danger' | 'success'; text: string } | null;
 
 export function BackupCard() {
   const last = lastBackupStore.useValue();
+  const [now] = useState(Date.now);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<Status>(null);
 
@@ -80,7 +81,7 @@ export function BackupCard() {
         Move your progress between devices or keep a copy. Import merges with what is here; nothing is deleted.
       </Text>
       <Text variant="small" tone="muted">
-        {`${lastBackupLabel(last, Date.now())} · Size: ${formatSize(storageUsage())}`}
+        {`${lastBackupLabel(last, now)} · Size: ${formatSize(storageUsage())}`}
       </Text>
       <Row>
         <Button label="Export backup" onPress={runExport} disabled={busy} />

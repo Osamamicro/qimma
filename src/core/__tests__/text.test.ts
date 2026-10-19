@@ -220,3 +220,23 @@ describe('grammarIssues', () => {
     expect(messages('I saw the the dog.')).toContain('Repeated word');
   });
 });
+
+describe('keyPointCoverage meaning check (sameSentence, ADR-011)', () => {
+  const peak = [{ label: 'Peak in the East', keywords: ['east', '27'], sameSentence: ['highest', 'largest', 'most'] }];
+
+  it('counts a figure said together with its trend word', () => {
+    expect(keyPointCoverage('The East has the largest classes, at 27 pupils.', peak).ratio).toBe(1);
+  });
+
+  it('does not count the figure when the trend word is in another sentence', () => {
+    expect(keyPointCoverage('The East has 27 pupils. The West is the largest region.', peak).ratio).toBe(0);
+  });
+
+  it('does not count a figure listed without any trend', () => {
+    expect(keyPointCoverage('East 27, West 19, North 24.', peak).ratio).toBe(0);
+  });
+
+  it('treats an unpunctuated transcript as one sentence', () => {
+    expect(keyPointCoverage('the east is highest with twenty seven pupils and 27 overall', peak).ratio).toBe(1);
+  });
+});

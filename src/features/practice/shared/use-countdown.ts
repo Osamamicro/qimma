@@ -4,17 +4,20 @@ import { useEffect, useRef, useState } from 'react';
 export function useCountdown(seconds: number, running: boolean, onDone?: () => void) {
   const [left, setLeft] = useState(seconds);
   const doneRef = useRef(onDone);
-  doneRef.current = onDone;
-
   useEffect(() => {
-    setLeft(seconds);
-  }, [seconds]);
+    doneRef.current = onDone;
+  });
+
+  // Reset to the full window when it changes or a run starts (adjusting state during render,
+  // not in an effect): a stale `left` (e.g. 0 from an earlier run) would end it on the first tick.
+  const [prev, setPrev] = useState({ seconds, running });
+  if (prev.seconds !== seconds || prev.running !== running) {
+    setPrev({ seconds, running });
+    if (prev.seconds !== seconds || running) setLeft(seconds);
+  }
 
   useEffect(() => {
     if (!running) return;
-    // Always count from the full window: a stale `left` (e.g. 0 from an earlier run) would end
-    // the countdown on the first tick.
-    setLeft(seconds);
     const started = Date.now();
     const id = setInterval(() => {
       const next = Math.max(0, seconds - Math.floor((Date.now() - started) / 1000));

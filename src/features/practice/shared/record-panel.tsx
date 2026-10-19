@@ -74,7 +74,8 @@ export function RecordPanel({ prepSec, responseSec, mode, ready = true, autoStar
     setPhase('prep');
   }, [mode, autoStart, ready, phase]);
 
-  useEffect(() => () => capture.cancel(), [capture.cancel]);
+  const cancelCapture = capture.cancel;
+  useEffect(() => () => cancelCapture(), [cancelCapture]);
 
   /** Mock only: give up on this question. Nothing recorded (durationMs 0) scores 0 out of the full maximum. */
   const skip = () => {

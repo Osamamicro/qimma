@@ -144,7 +144,8 @@ export function scoreOpenSpeech(
   if (ratio === 0) feedback.push('Content: talk about what is actually in the prompt, not a memorised template.');
   values[contentId] = band(ratio, 6);
   feedback.push(`Covered ${coverage.covered.length} of ${keyPoints.length} key points.`);
-  if (coverage.missed.length > 0) feedback.push(`Missing: ${coverage.missed.map((k) => k.label).join('; ')}`);
+  if (coverage.missed.length > 0)
+    feedback.push(`Missing: ${coverage.missed.map((k) => (k.speaker ? `${k.speaker}: ${k.label}` : k.label)).join('; ')}`);
 
   const spec = getTaskType(taskType);
   values.fluency = fluencyBand(hyp, response.durationMs, spec.timing.responseSec ?? 40);

@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import { createElement, type ComponentType } from 'react';
 
 import { Card, Text } from '@/components/ui';
 import type { Item } from '@/core';
@@ -19,6 +19,7 @@ function Unsupported({ item }: RendererProps) {
   );
 }
 
-export function rendererFor(item: Item): ComponentType<RendererProps> {
-  return (ALL[item.type] as ComponentType<RendererProps> | undefined) ?? Unsupported;
+/** Renders the task renderer for `props.item.type` (one static component for the players). */
+export function ItemRenderer(props: RendererProps<Item>) {
+  return createElement((ALL[props.item.type] as ComponentType<RendererProps> | undefined) ?? Unsupported, props);
 }

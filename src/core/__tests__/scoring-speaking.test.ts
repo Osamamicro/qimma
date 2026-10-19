@@ -224,3 +224,16 @@ describe('Whisper transcripts from phone recordings (ADR-004, ADR-015)', () => {
     expect(trait(r, 'fluency').unscored).toBeUndefined();
   });
 });
+
+describe('Summarize Group Discussion speaker-tagged key points', () => {
+  const kps: KeyPoint[] = [
+    { label: 'Topic', keywords: ['composting'] },
+    { label: 'Supports a pilot', keywords: ['pilot'], speaker: 'Daniel' },
+    { label: 'Smell and pests', keywords: ['pests', 'smell'], speaker: 'Daniel' },
+  ];
+
+  it('names the speaker of each missed view', () => {
+    const r = scoreOpenSpeech('summarize-group-discussion', kps, 'model', speech('They discussed composting and a pilot.', 60000));
+    expect(r.feedback).toContain('Missing: Daniel: Smell and pests');
+  });
+});

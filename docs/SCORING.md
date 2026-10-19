@@ -38,6 +38,10 @@ Needs a transcript (web: browser speech recognition).
   insertions, substitutions), RS 0–3 as in PTE.
 - **Open tasks (DI, RL, SGD, RTS)**: key-point coverage with the same on-topic floor; RTS adds
   politeness/appropriacy markers once the answer is on topic.
+- **Describe Image figures** (ADR-011): a figure point counts only when its trend or comparison
+  word is in the same sentence ("Solar rose to 40%"), not for a bare list of numbers.
+- **Summarize Group Discussion**: views are tagged with their speaker, and missed ones are named
+  ("Missing: Daniel: Smell and pests").
 - **Fluency**: speaking rate (110–170 wpm best), hesitations, repetitions, use of the window.
 - **Pronunciation**: recogniser confidence blended with recognition rate (a proxy, not phonetics).
 - Phones with the local Whisper server (ADR-015): the recording is transcribed on the PC and

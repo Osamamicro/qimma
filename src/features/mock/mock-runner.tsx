@@ -5,7 +5,7 @@ import { Alert, View } from 'react-native';
 import { Button, Card, Chip, ProgressBar, Row, Screen, Stat, Text } from '@/components/ui';
 import { ALL_ITEMS } from '@/content';
 import { assembleMock, getExam, getTaskType, scoreItem, type Item, type Response, type ScoreResult, type TaskTypeId } from '@/core';
-import { rendererFor } from '@/features/practice/renderers';
+import { ItemRenderer } from '@/features/practice/renderers';
 import { formatClock, useCountdown } from '@/features/practice/shared';
 import { recordAttempt, saveMock, uid, useSettings } from '@/services/app-state';
 import { useColors } from '@/theme';
@@ -269,7 +269,6 @@ interface SectionRunProps {
 
 function SectionRun({ name, minutes, size, position, cursor, item, onSubmit, onDraft, onTimeUp, onQuit }: SectionRunProps) {
   const spec = getTaskType(item.type);
-  const Renderer = rendererFor(item);
   return (
     <Screen>
       <Stack.Screen options={{ title: name, headerBackVisible: false }} />
@@ -290,7 +289,7 @@ function SectionRun({ name, minutes, size, position, cursor, item, onSubmit, onD
         <Text variant="heading">{item.title}</Text>
         <Text tone="muted">{spec.instructions}</Text>
       </View>
-      <Renderer key={`${cursor}-${item.id}`} item={item} mode="mock" onSubmit={onSubmit} onDraft={onDraft} result={null} />
+      <ItemRenderer key={`${cursor}-${item.id}`} item={item} mode="mock" onSubmit={onSubmit} onDraft={onDraft} result={null} />
     </Screen>
   );
 }

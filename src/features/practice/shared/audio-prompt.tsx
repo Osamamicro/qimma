@@ -39,7 +39,9 @@ export function AudioPrompt({ item, mode, onFinished, showTranscript }: AudioPro
   const [elapsed, setElapsed] = useState(0);
   const handle = useRef<SpeakHandle | null>(null);
   const finishedRef = useRef(onFinished);
-  finishedRef.current = onFinished;
+  useEffect(() => {
+    finishedRef.current = onFinished;
+  });
 
   const words = utterances.reduce((n, u) => n + u.text.split(/\s+/).length, 0);
   const estimatedSec = Math.max(2, (words / (150 * settings.speechRate)) * 60);
@@ -65,11 +67,14 @@ export function AudioPrompt({ item, mode, onFinished, showTranscript }: AudioPro
 
   const countdown = useCountdown(3, status === 'countdown', play);
 
-  // Recorded-file completion.
+  // Recorded-file completion, from the player's own event (playback only starts from play()).
   useEffect(() => {
-    if (file && status === 'playing' && fileStatus.didJustFinish) finish();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fileStatus.didJustFinish]);
+    if (!file) return;
+    const sub = player.addListener('playbackStatusUpdate', (s) => {
+      if (s.didJustFinish) finish();
+    });
+    return () => sub.remove();
+  }, [player, file]);
 
   // Progress estimate for TTS (engines do not report duration).
   useEffect(() => {

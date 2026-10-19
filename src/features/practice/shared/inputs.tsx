@@ -5,6 +5,8 @@ import { wordCount, type Option } from '@/core';
 import { useSettings } from '@/services/app-state';
 import { radius, space, type as typeScale, useColors } from '@/theme';
 
+import { stableShuffle } from '../reading/seeded-shuffle';
+
 /** Passage or prompt text in a comfortable reading style. */
 export function Passage({ text, label }: { text: string; label?: string }) {
   const c = useColors();
@@ -38,9 +40,12 @@ export function ChoiceList({ options, multiple, selected, onChange, correct, dis
     if (multiple) onChange(selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id]);
     else onChange([id]);
   };
+  // Stable shuffle keyed on the options themselves, so the keyed answer is not always in the
+  // position the author wrote it (authors favour "b") and stays put across re-renders and reviews.
+  const shown = stableShuffle(options, options.map((o) => o.id + o.text).join('|'));
   return (
     <View style={{ gap: space.sm }} accessibilityRole={multiple ? undefined : 'radiogroup'}>
-      {options.map((o, i) => {
+      {shown.map((o, i) => {
         const isSel = selected.includes(o.id);
         const isRight = correct?.includes(o.id);
         const border = correct ? (isRight ? c.success : isSel ? c.danger : c.border) : isSel ? c.primary : c.border;

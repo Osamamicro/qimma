@@ -277,9 +277,9 @@ export const speakingItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['household energy', 'energy use', 'energy', 'households', 'purpose'] },
-      { label: 'Highest share', keywords: ['space heating', 'heating', '42', 'forty-two', 'largest', 'highest'] },
-      { label: 'Lowest share', keywords: ['lighting', '7', 'seven', 'smallest', 'lowest', 'least'] },
-      { label: 'Comparison', keywords: ['appliances', '24', 'twenty-four', 'water heating', '18', 'second'] },
+      { label: 'Highest share', keywords: ['space heating', 'heating', '42', 'forty-two'], sameSentence: ['largest', 'highest', 'most', 'biggest', 'peak'] },
+      { label: 'Lowest share', keywords: ['lighting', '7', 'seven'], sameSentence: ['smallest', 'lowest', 'least', 'smaller'] },
+      { label: 'Comparison', keywords: ['appliances', '24', 'twenty-four', 'water heating', '18'], sameSentence: ['second', 'followed', 'behind'] },
       { label: 'Conclusion', keywords: ['60 percent', 'sixty percent', 'more than half', 'insulation', 'overall', 'heating and water'] },
     ],
     modelAnswer:
@@ -304,10 +304,10 @@ export const speakingItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['study hours', 'studying', 'weekly hours', 'hours', 'students'] },
-      { label: 'Highest figure', keywords: ['fourth year', '21', 'twenty-one', 'highest', 'final year'] },
-      { label: 'Lowest figure', keywords: ['first year', '9', 'nine', 'lowest', 'least'] },
-      { label: 'Full-time versus part-time', keywords: ['full-time', 'full time', 'part-time', 'part time', 'higher', 'every year'] },
-      { label: 'Trend', keywords: ['rise', 'rises', 'increase', 'increases', 'grow', 'grows', 'steadily', 'trend'] },
+      { label: 'Highest figure', keywords: ['fourth year', '21', 'twenty-one', 'final year'], sameSentence: ['highest', 'most', 'peak'] },
+      { label: 'Lowest figure', keywords: ['first year', '9', 'nine'], sameSentence: ['lowest', 'least', 'fewest'] },
+      { label: 'Full-time versus part-time', keywords: ['full-time', 'full time', 'part-time', 'part time'], sameSentence: ['more', 'higher', 'than'] },
+      { label: 'Trend', keywords: ['study time', 'studying', 'hours'], sameSentence: ['rise', 'rises', 'grow', 'grows', 'increase', 'steadily'] },
     ],
     modelAnswer:
       'This bar chart compares average weekly study hours for full-time and part-time students across four years of study, using illustrative figures. Study time rises steadily for both groups as students move through their degrees. Full-time students study more than part-time students in every year. The highest figure is 21 hours for full-time fourth-year students, while the lowest is 9 hours for part-time students in their first year. Overall, the workload grows as courses become more specialised, and part-time students consistently study less.',
@@ -332,9 +332,9 @@ export const speakingItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['rainfall', 'rain', 'precipitation', 'seasons', 'seasonal'] },
-      { label: 'Highest figure', keywords: ['northport', 'winter', '130', 'highest', 'wettest'] },
-      { label: 'Lowest figure', keywords: ['riverton', 'summer', '25', 'lowest', 'least'] },
-      { label: 'Lakeside exception', keywords: ['lakeside', '80', 'exception', 'only'] },
+      { label: 'Highest figure', keywords: ['northport', 'winter', '130'], sameSentence: ['highest', 'most', 'peaking', 'peak', 'wettest'] },
+      { label: 'Lowest figure', keywords: ['riverton', 'summer', '25'], sameSentence: ['lowest', 'least', 'smallest'] },
+      { label: 'Lakeside exception', keywords: ['lakeside', '80', 'exception', 'only'], sameSentence: ['wettest', 'highest', 'most'] },
       { label: 'Conclusion', keywords: ['flood', 'colder months', 'two of the three', 'winter', 'wettest'] },
     ],
     modelAnswer:
@@ -385,10 +385,10 @@ export const speakingItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['visitors', 'museum', 'attendance', 'monthly', 'visits'] },
-      { label: 'Peak month', keywords: ['august', 'peak', 'highest', '39', 'thirty-nine'] },
-      { label: 'Quietest month', keywords: ['february', 'lowest', '13', 'thirteen', 'quietest'] },
-      { label: 'Adults versus students', keywords: ['adults', 'students', 'student', 'outnumber', 'higher', 'every month'] },
-      { label: 'Seasonal pattern', keywords: ['summer', 'seasonal', 'busiest period', 'rise', 'climb', 'trend'] },
+      { label: 'Peak month', keywords: ['august', '39', 'thirty-nine'], sameSentence: ['peak', 'highest', 'busiest', 'most'] },
+      { label: 'Quietest month', keywords: ['february', '13', 'thirteen'], sameSentence: ['lowest', 'quietest', 'least'] },
+      { label: 'Adults versus students', keywords: ['adults', 'students', 'student'], sameSentence: ['outnumber', 'higher', 'more', 'than'] },
+      { label: 'Seasonal pattern', keywords: ['summer', 'seasonal'], sameSentence: ['busiest', 'climb', 'rise', 'peak'] },
     ],
     modelAnswer:
       'This line graph shows monthly visits to a city museum over one year, using illustrative figures. Both adult and student visitors follow a clear seasonal pattern. Numbers climb steadily from February to a peak in August, when about thirty-nine thousand people visited in total, with twenty-four thousand of them adults. The quietest month is February, with around thirteen thousand visitors. Adults outnumber students in every month. Overall, summer is the busiest period, so the museum could plan extra staff and events for those months.',
@@ -412,9 +412,9 @@ export const speakingItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['solar', 'solar panels', 'solar output', 'energy', 'household use'] },
-      { label: 'Peak output', keywords: ['sunday', 'saturday', 'weekend', 'highest', 'peak'] },
-      { label: 'Lowest output', keywords: ['thursday', 'lowest', 'cloudy', 'cloud', 'dip'] },
-      { label: 'Comparison with use', keywords: ['exceeds', 'more than', 'surplus', 'five days', 'most days', 'above'] },
+      { label: 'Peak output', keywords: ['sunday', 'saturday', 'weekend'], sameSentence: ['highest', 'peak', 'peaking'] },
+      { label: 'Lowest output', keywords: ['thursday', 'cloudy', 'cloud'], sameSentence: ['lowest', 'falls', 'fell', 'dip'] },
+      { label: 'Comparison with use', keywords: ['household use', 'surplus', 'five days', 'most days'], sameSentence: ['exceeds', 'above', 'more than'] },
       { label: 'Conclusion', keywords: ['storage', 'battery', 'grid', 'two days', 'wednesday', 'weather'] },
     ],
     modelAnswer:
@@ -438,9 +438,9 @@ export const speakingItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['waste', 'household waste', 'rubbish', 'garbage', 'disposal'] },
-      { label: 'Largest share', keywords: ['recycled', 'recycling', '38', 'largest', 'biggest'] },
-      { label: 'Landfill', keywords: ['landfill', '29', 'second', 'second biggest'] },
-      { label: 'Smallest share', keywords: ['energy recovery', '11', 'eleven', 'smallest', 'least'] },
+      { label: 'Largest share', keywords: ['recycled', 'recycling', '38'], sameSentence: ['largest', 'biggest', 'most', 'highest'] },
+      { label: 'Landfill', keywords: ['landfill', '29'], sameSentence: ['second'] },
+      { label: 'Smallest share', keywords: ['energy recovery', '11', 'eleven'], sameSentence: ['smallest', 'least', 'lowest'] },
       { label: 'Diverted from landfill', keywords: ['71', 'seventy-one', 'diverted', 'composted', 'composting', 'avoided'] },
     ],
     modelAnswer:
@@ -466,9 +466,9 @@ export const speakingItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['students', 'course', 'courses', 'choose', 'choice', 'reasons'] },
-      { label: 'Career prospects', keywords: ['career', 'career prospects', 'jobs', 'employment', '34'] },
-      { label: 'Personal interest', keywords: ['personal interest', 'interest', '27', 'second'] },
-      { label: 'Smaller reasons', keywords: ['location', 'scholarship', 'family', 'other', 'smallest', '7'] },
+      { label: 'Career prospects', keywords: ['career', 'career prospects', 'jobs', 'employment', '34'], sameSentence: ['largest', 'biggest', 'most', 'top', 'highest'] },
+      { label: 'Personal interest', keywords: ['personal interest', 'interest', '27'], sameSentence: ['second'] },
+      { label: 'Smaller reasons', keywords: ['location', 'scholarship', 'family', 'other', '7'], sameSentence: ['smaller', 'smallest', 'least'] },
       { label: 'Combined share', keywords: ['61', 'sixty-one', 'together', 'combined', 'more than half', 'majority'] },
     ],
     modelAnswer:
@@ -492,10 +492,10 @@ export const speakingItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['commute', 'commuting', 'travel', 'transport', 'options'] },
-      { label: 'Fastest option', keywords: ['subway', 'fastest', '30', 'thirty', 'shortest'] },
-      { label: 'Slowest option', keywords: ['bus', 'slowest', 'longest', '48', 'forty-eight'] },
-      { label: 'Cheapest option', keywords: ['bicycle', 'cheapest', '15', 'fifteen', 'least expensive'] },
-      { label: 'Car and overall balance', keywords: ['car', 'most expensive', '320', 'overall', 'balance', 'best value'] },
+      { label: 'Fastest option', keywords: ['subway', '30', 'thirty'], sameSentence: ['fastest', 'shortest', 'quickest'] },
+      { label: 'Slowest option', keywords: ['bus', '48', 'forty-eight'], sameSentence: ['slowest', 'longest'] },
+      { label: 'Cheapest option', keywords: ['bicycle', '15', 'fifteen'], sameSentence: ['cheapest', 'least expensive', 'lowest'] },
+      { label: 'Car and overall balance', keywords: ['car', '320', 'overall', 'balance', 'best value'], sameSentence: ['highest', 'most expensive', 'most'] },
     ],
     modelAnswer:
       'This table compares four ways to commute, using illustrative figures. The subway is the fastest option, at around 30 minutes door to door, and it is also one of the most reliable. The bus takes longest, at 48 minutes, and rates only three out of five for reliability. Cycling is the cheapest option, at only 15 dollars a month, although weather can affect it. The car costs 320 dollars a month, the highest of the four. Overall, the subway offers the best balance of time, cost and reliability.',
@@ -517,7 +517,7 @@ export const speakingItems: Item[] = [
     },
     keyPoints: [
       { label: 'Topic', keywords: ['gym', 'membership', 'plans', 'fees', 'membership plans'] },
-      { label: 'Cheapest plan', keywords: ['basic', 'cheapest', '25', 'twenty-five', 'least expensive'] },
+      { label: 'Cheapest plan', keywords: ['basic', '25', 'twenty-five'], sameSentence: ['cheapest', 'least expensive', 'lowest'] },
       { label: 'Premium access', keywords: ['premium', '70', 'seventy', 'round the clock', '24 hours', 'all day'] },
       { label: 'Group classes', keywords: ['classes', 'group classes', '12', 'twelve', 'four', 'standard'] },
       { label: 'Trade-off', keywords: ['trade-off', 'flexibility', 'cost', 'value', 'worth'] },
@@ -903,9 +903,9 @@ export const speakingItems: Item[] = [
     ],
     keyPoints: [
       { label: 'Topic', keywords: ['composting', 'compost', 'food waste', 'residence halls', 'residence'] },
-      { label: 'Maya supports it', keywords: ['soil', 'environment', 'environmental', 'sustainable', 'sustainability'] },
-      { label: 'Daniel has concerns', keywords: ['cost', 'costs', 'smell', 'pests', 'maintenance', 'hygiene', 'concern', 'concerns'] },
-      { label: 'Lecturer proposes a pilot', keywords: ['pilot', 'trial', 'two buildings', 'measure', 'data'] },
+      { label: 'Maya supports it', keywords: ['soil', 'environment', 'environmental', 'sustainable', 'sustainability'], speaker: 'Maya' },
+      { label: 'Daniel has concerns', keywords: ['cost', 'costs', 'smell', 'pests', 'maintenance', 'hygiene', 'concern', 'concerns'], speaker: 'Daniel' },
+      { label: 'Lecturer proposes a pilot', keywords: ['pilot', 'trial', 'two buildings', 'measure', 'data'], speaker: 'Professor Lee' },
       { label: 'Conclusion', keywords: ['agree', 'agreed', 'agreement', 'merit', 'budget', 'planning'] },
     ],
     modelAnswer:
@@ -960,9 +960,9 @@ export const speakingItems: Item[] = [
     ],
     keyPoints: [
       { label: 'Topic', keywords: ['mentoring', 'mentor', 'mentors', 'peer mentoring', 'international students', 'first year'] },
-      { label: 'Daniel is sceptical', keywords: ['existing services', 'already', 'duplicate', 'not convinced', 'busy', 'enough'] },
-      { label: 'Maya supports it', keywords: ['social', 'social side', 'answers', 'department', 'same field', 'useful', 'helpful'] },
-      { label: 'Training and structure', keywords: ['training', 'trained', 'certificate', 'accredited', 'forum', 'in person', 'twice a month'] },
+      { label: 'Daniel is sceptical', keywords: ['existing services', 'already', 'duplicate', 'not convinced', 'busy', 'enough'], speaker: 'Daniel' },
+      { label: 'Maya supports it', keywords: ['social', 'social side', 'answers', 'department', 'same field', 'useful', 'helpful'], speaker: 'Maya' },
+      { label: 'Training and structure', keywords: ['training', 'trained', 'certificate', 'accredited', 'forum', 'in person', 'twice a month'], speaker: 'Professor Lee' },
       { label: 'Conclusion', keywords: ['voluntary', 'trial', 'pilot', 'review', 'evaluated', 'evaluation', 'agree', 'agreed'] },
     ],
     modelAnswer:
@@ -1017,9 +1017,9 @@ export const speakingItems: Item[] = [
     ],
     keyPoints: [
       { label: 'Topic', keywords: ['textbook', 'e-book', 'ebook', 'electronic', 'biology', 'printed'] },
-      { label: 'Maya supports the e-book', keywords: ['searchable', 'updated', 'cheaper', 'less expensive', 'cost less', 'forty percent', '40 percent'] },
-      { label: 'Daniel prefers paper', keywords: ['paper', 'concentrate', 'focus', 'eyes', 'screen', 'printed'] },
-      { label: 'Lecturer proposes a hybrid', keywords: ['hybrid', 'both', 'core chapters', 'lab manual', 'laboratory manual', 'combination'] },
+      { label: 'Maya supports the e-book', keywords: ['searchable', 'updated', 'cheaper', 'less expensive', 'cost less', 'forty percent', '40 percent'], speaker: 'Maya' },
+      { label: 'Daniel prefers paper', keywords: ['paper', 'concentrate', 'focus', 'eyes', 'screen', 'printed'], speaker: 'Daniel' },
+      { label: 'Lecturer proposes a hybrid', keywords: ['hybrid', 'both', 'core chapters', 'lab manual', 'laboratory manual', 'combination'], speaker: 'Professor Lee' },
       { label: 'Conclusion', keywords: ['agree', 'agreed', 'offline', 'sensible', 'compare prices', 'reasonable'] },
     ],
     modelAnswer:
@@ -1079,9 +1079,9 @@ export const speakingItems: Item[] = [
     ],
     keyPoints: [
       { label: 'Topic', keywords: ['light rail', 'light-rail', 'bus', 'buses', 'transit', 'public transport'] },
-      { label: 'Daniel favours buses', keywords: ['cheaper', 'flexible', 'bus network', 'routes', 'budget', 'cost'] },
-      { label: 'Maya favours rail', keywords: ['reliable', 'reliability', 'capacity', 'passengers', 'housing', 'development', 'congestion'] },
-      { label: 'Phased approach', keywords: ['phased', 'phase', 'stages', 'staged', 'dedicated lanes', 'bus lanes', 'ridership data'] },
+      { label: 'Daniel favours buses', keywords: ['cheaper', 'flexible', 'bus network', 'routes', 'budget', 'cost'], speaker: 'Daniel' },
+      { label: 'Maya favours rail', keywords: ['reliable', 'reliability', 'capacity', 'passengers', 'housing', 'development', 'congestion'], speaker: 'Maya' },
+      { label: 'Phased approach', keywords: ['phased', 'phase', 'stages', 'staged', 'dedicated lanes', 'bus lanes', 'ridership data'], speaker: 'Professor Lee' },
       { label: 'Conclusion', keywords: ['agree', 'agreed', 'timetable', 'measure', 'existing network', 'improve'] },
     ],
     modelAnswer:
@@ -1136,9 +1136,9 @@ export const speakingItems: Item[] = [
     ],
     keyPoints: [
       { label: 'Topic', keywords: ['hybrid', 'hybrid working', 'hybrid policy', 'office', 'working from home', 'home'] },
-      { label: 'Maya supports it', keywords: ['flexibility', 'flexible', 'turnover', 'sick days', 'commute', 'commutes', 'retention'] },
-      { label: 'Daniel has reservations', keywords: ['new staff', 'junior', 'learn', 'informal', 'fall behind', 'face to face'] },
-      { label: 'Lecturer proposes structure', keywords: ['new hires', 'first three months', 'coordinate', 'office days', 'productivity', 'research'] },
+      { label: 'Maya supports it', keywords: ['flexibility', 'flexible', 'turnover', 'sick days', 'commute', 'commutes', 'retention'], speaker: 'Maya' },
+      { label: 'Daniel has reservations', keywords: ['new staff', 'junior', 'learn', 'informal', 'fall behind', 'face to face'], speaker: 'Daniel' },
+      { label: 'Lecturer proposes structure', keywords: ['new hires', 'first three months', 'coordinate', 'office days', 'productivity', 'research'], speaker: 'Professor Lee' },
       { label: 'Conclusion', keywords: ['trial', 'review', 'training', 'managers', 'agree', 'agreed', 'six months'] },
     ],
     modelAnswer:

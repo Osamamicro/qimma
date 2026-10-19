@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 
 import { Button, Card, Chip, ProgressBar, Row, ScoreScale, Screen, SectionTitle, Stat, Text } from '@/components/ui';
@@ -36,7 +36,8 @@ export default function ProgressTab() {
   const mocks = mocksStore.useValue();
   const targets = skillTargets(settings);
   const preset = getTarget(settings.targetId);
-  const streak = streakDays(attempts, Date.now());
+  const [now] = useState(Date.now);
+  const streak = streakDays(attempts, now);
   const days = useMemo(() => dailyCounts(attempts, WINDOW_DAYS), [attempts]);
   const busiest = Math.max(1, ...days.map((d) => d.count));
   const inWindow = days.reduce((n, d) => n + d.count, 0);

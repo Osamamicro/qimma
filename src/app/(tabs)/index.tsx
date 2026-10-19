@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 
 import { Button, Card, ListGroup, ListRow, Row, ScoreScale, Screen, Segmented, SectionTitle, Text } from '@/components/ui';
@@ -25,7 +25,8 @@ export default function TodayScreen() {
   const attempts = useAttempts();
   const estimate = useEstimate();
   const cards = vocabStore.useValue();
-  const now = Date.now();
+  // Read once per mount: render must be pure (React Compiler).
+  const [now] = useState(Date.now);
   const dueVocab = vocabEntries.filter((v) => cards[v.id] && isDue(cards[v.id], now)).length;
   const targets = skillTargets(settings);
   const preset = getTarget(settings.targetId);
