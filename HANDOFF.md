@@ -21,11 +21,11 @@ Australian Home Affairs scale, R69 L70 S88 W85 on PTE Academic.
 | Web | GitHub Pages: https://osamamicro.github.io/qimma/ (deployed by `.github/workflows/pages.yml` on every push to `main`). |
 | CI | `.github/workflows/ci.yml` runs typecheck, tests and the web build on every PR and push. |
 | Task types | All 22 PTE Academic types + PTE Core *Write Email*. One renderer per type in `src/features/practice/{speaking,writing,reading,listening}`. |
-| Content | 304 original items (enough for three full mocks without repeats in both exams), 220 vocabulary entries, a strategy guide per task type (`src/content/`). |
+| Content | 1,000 original items (every type covers several full mocks without repeats), 220 vocabulary entries, a strategy guide per task type (`src/content/`). |
 | Scoring | Exact PTE rules for objective tasks. Trait-level heuristic estimates for speaking and writing, with a 25% on-topic floor (`src/core/scoring`). |
 | Official data | Pearson weighting (Aug 2025), DHA 2025 targets and test-structure ranges, all in `src/core/exams/`. |
 | Features | Practice player, full/mini/section mocks + report, vocab SRS (SM-2), daily plan, progress, settings, progress backup (JSON export/import with merge, storage-failure banner; ADR-013). |
-| Quality | `tsc` clean, Vitest 293/293, web export OK; the main flows were checked manually and with headless Playwright during development at a 390px viewport (no e2e specs are committed). |
+| Quality | `tsc` clean, ESLint clean (`expo lint`, in CI), Vitest 302/302, web export OK; the main flows were checked manually and with headless Playwright during development at a 390px viewport (no e2e specs are committed). |
 | Emulator | `scripts/setup-android-emulator.{ps1,sh}` (one-time setup) + `npm run emulator:android`. |
 | Phone STT | Optional local Whisper server `tools/stt-server` (ADR-015): speaking tasks on phones get content scores when `EXPO_PUBLIC_LOCAL_STT_URL` is set. |
 
@@ -33,7 +33,7 @@ Australian Home Affairs scale, R69 L70 S88 W85 on PTE Academic.
 the app in Expo Go (SDK 58) on an Android 36 emulator, Repeat Sentence text-to-speech, and
 microphone recording and playback. iOS and a physical phone are still unverified.
 
-**Last check (2026-10-18, owner's Windows PC):** `npm run check` (tsc clean, 293/293) and the
+**Last check (2026-10-18, owner's Windows PC):** `npm run check` (tsc clean, 302/302) and the
 web build are green. Item 2 (backup) works in the browser (export, import with merge preview,
 storage-failure banner) and in the Android emulator (share-sheet export, file-picker import).
 
@@ -44,7 +44,7 @@ git clone https://github.com/Osamamicro/qimma.git
 cd qimma
 npm install
 npx expo start --web --port 8099   # once, then Ctrl+C: generates .expo/types for typed routes
-npm run check                      # typecheck + 293 tests; must be green before you change anything
+npm run check                      # typecheck + lint + 302 tests; must be green before you change anything
 npm run web                        # Chrome/Edge (speech scoring needs the Web Speech API)
 npm run emulator:android           # after the one-time setup script; see docs/EMULATOR.md
 ```
@@ -111,20 +111,22 @@ Each item lists *done when*.
    end in the Android emulator (upload, transcription, content score, fluency and pronunciation
    "not scored"). Setup: `docs/EMULATOR.md` §2.5. Remaining: a physical phone over Wi-Fi, and
    calibrating fluency and pronunciation for Whisper transcripts.
-5. **Image-based Describe Image items (ADR-011).** Add figure-and-direction key points: a figure
-   only counts when it appears with the right trend word in the same sentence.
-6. **Summarize Group Discussion note grid (ADR-011).** One note column per speaker during the
-   audio, and speaker-tagged key points.
-7. **Content to 1,000 items** (304 on 2026-10-18; every task type now covers three full mocks without repeats), using content-author agents plus a human review checklist. Add
-   recorded audio for listening (the `audio` field overrides text-to-speech).
-8. **Tooling.** Add an ESLint config so `expo lint` can run in CI. CI and the Pages deploy already exist.
+5. **Meaning-aware Describe Image key points (ADR-011). Done 2026-10-19.** `KeyPoint.sameSentence`:
+   a figure counts only with its trend word in the same sentence; all chart items use it.
+6. **Summarize Group Discussion note grid (ADR-011). Done 2026-10-19.** One note column per
+   speaker; key points carry `speaker` and missed views are named.
+7. **Content to 1,000 items. Done 2026-10-19** (nine content-author agents, then three
+   adversarial answer-key reviews; ~40 fixes applied). Bank gates: model answers cover their own
+   key points, no repeated prompts; options are shown in a stable shuffle. Remaining: a human pass
+   with `docs/CONTENT-REVIEW.md`, and recorded listening audio (needs voice talent; the `audio`
+   field overrides text-to-speech).
+8. **Tooling. Done 2026-10-19.** ESLint (`eslint-config-expo`, flat config) runs in
+   `npm run check` and CI; the React Compiler rule findings it raised were fixed, not silenced.
 9. **Later:** accounts and sync (Supabase anonymous auth), teacher mode, then IELTS, TOEFL and
    DET as new `ExamSpec`s.
 
 ## 7. Decisions waiting on the owner
 
-- **GitHub Pages source.** In the repo's Settings → Pages, choose **GitHub Actions** once,
-  or the deploy job cannot publish.
 - **AI services.** Hosted scoring needs an open-model provider key (`LLM_API_KEY` secret); local Ollama needs none. The unused `ANTHROPIC_API_KEY` secret can be deleted.
 
 ## 8. Gotchas
