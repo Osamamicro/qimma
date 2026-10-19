@@ -13,7 +13,12 @@ export function validateItem(item: Item): string[] {
 
   const keyPoints = (kps: KeyPoint[], min: number) => {
     if (kps.length < min) err(`needs at least ${min} key points`);
-    for (const kp of kps) if (kp.keywords.length === 0) err(`key point "${kp.label}" has no keywords`);
+    for (const kp of kps) {
+      if (kp.keywords.length === 0) err(`key point "${kp.label}" has no keywords`);
+      if (kp.sameSentence?.length === 0) err(`key point "${kp.label}" has an empty sameSentence list`);
+      if ([...kp.keywords, ...(kp.sameSentence ?? [])].some((k) => k !== k.toLowerCase()))
+        err(`key point "${kp.label}" words must be lower-case`);
+    }
   };
   const options = (opts: Option[], min: number) => {
     if (opts.length < min) err(`needs at least ${min} options`);
@@ -52,6 +57,9 @@ export function validateItem(item: Item): string[] {
       if (item.turns.length < 3) err('needs at least 3 turns');
       if (new Set(item.turns.map((t) => t.speaker)).size < 2) err('needs at least 2 speakers');
       keyPoints(item.keyPoints, 3);
+      for (const kp of item.keyPoints)
+        if (kp.speaker && !item.turns.some((t) => t.speaker === kp.speaker))
+          err(`key point "${kp.label}" speaker "${kp.speaker}" is not in the discussion`);
       break;
     case 'respond-to-situation':
       range('situation', item.situation, 25, 90);

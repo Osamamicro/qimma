@@ -52,6 +52,7 @@ export const guides: TaskGuide[] = [
       'Open with one sentence that names the type of visual and its main message, such as "This line graph shows how..."',
       'Choose your figures carefully. The highest and lowest values, the biggest change and the final figure matter most, so you do not need every number.',
       'Use trend language with precise verbs and adverbs, such as "rose sharply", "fell gradually" or "levelled off", and keep your tenses consistent.',
+      'Say each figure in the same sentence as its trend or comparison ("Solar rose to 40%", "the East has the highest figure, 27"). A number on its own does not show you understood the chart, and Qimma only counts it with its trend.',
       'Use the full 40 seconds. In PTE Academic you will usually meet about 5–6 Describe Image items, so a repeatable structure saves time.',
       'Practise with a timer and check that every response covers the trend, the key data and a conclusion.',
     ],
@@ -106,7 +107,7 @@ export const guides: TaskGuide[] = [
     summary:
       'Summarize Group Discussion asks you to listen to several speakers discuss a topic, then summarise the main points and each speaker’s view. It feeds listening and speaking; in PTE Academic it is about 9% of the overall score, with about 20% of Listening and 19% of Speaking.',
     tips: [
-      'Use the 10 seconds of preparation to note the topic and give each speaker a short tag, such as "Maya: for" or "Tom: against".',
+      'Use the 10 seconds of preparation to note the topic and give each speaker a short tag, such as "Maya: for" or "Tom: against". In Qimma, the note grid gives each speaker a column.',
       'Listen for the disagreement: each speaker’s position, their reason, and any point where the group agrees.',
       'Give each view its own clause, such as "Tom thinks the plan is too expensive because...", rather than quoting directly.',
       'Open with the topic and the group’s overall position, then move through the speakers in the order they spoke.',

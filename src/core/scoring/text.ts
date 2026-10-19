@@ -130,10 +130,15 @@ export interface Coverage {
 
 export function keyPointCoverage(text: string, keyPoints: KeyPoint[]): Coverage {
   const stems = tokenize(text).map(stem);
+  const sentenceStems = splitSentences(text).map((s) => tokenize(s).map(stem));
+  const has = (s: string[], words: string[]) => words.some((k) => containsPhrase(s, k));
   const covered: KeyPoint[] = [];
   const missed: KeyPoint[] = [];
   for (const kp of keyPoints) {
-    (kp.keywords.some((k) => containsPhrase(stems, k)) ? covered : missed).push(kp);
+    const ok = kp.sameSentence
+      ? sentenceStems.some((s) => has(s, kp.keywords) && has(s, kp.sameSentence!))
+      : has(stems, kp.keywords);
+    (ok ? covered : missed).push(kp);
   }
   return { covered, missed, ratio: keyPoints.length === 0 ? 0 : covered.length / keyPoints.length };
 }

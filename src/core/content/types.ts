@@ -24,6 +24,14 @@ export interface KeyPoint {
   label: string;
   /** Lower-case words or short phrases; simple stemming is applied when matching. */
   keywords: string[];
+  /**
+   * Meaning check (ADR-011): the point counts only when one of these words appears in the same
+   * sentence as a keyword, e.g. a figure with its trend ("27" with "highest", "rose" or "peak").
+   * Unpunctuated transcripts are one sentence, so this then needs both anywhere in the answer.
+   */
+  sameSentence?: string[];
+  /** Summarize Group Discussion: whose view this is (a `turns` speaker); shown in feedback. */
+  speaker?: string;
 }
 
 export interface Option {

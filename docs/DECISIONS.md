@@ -260,3 +260,15 @@ paid APIs. The sister project Mudawwin already runs Whisper locally (Whisper.net
 Firewall allow rule for port 8178). Elsewhere they keep self-review. Whisper can invent short
 phrases ("Thank you.") from near-silence; such answers score 0 content, the same as silence.
 Windows only for now; a hosted Whisper behind the same endpoint would need no app change.
+
+### ADR-011 — outcome (2026-10-19)
+
+- **Meaning-aware Describe Image key points.** `KeyPoint.sameSentence` lists trend or comparison
+  words; such a point counts only when one of them appears in the same sentence as a keyword
+  (`keyPointCoverage`). 48 points across 15 existing items use it; process diagrams do not.
+  Unpunctuated transcripts are one sentence, so there it means "both said anywhere".
+- **Summarize Group Discussion note grid.** One note column per speaker while listening (never
+  scored or saved). Key points carry `speaker`; missed views are reported as "Speaker: point"
+  and each column lists its speaker's points after scoring.
+- **Bank quality gates** (`content-bank.test.ts`): every model answer must cover all its own key
+  points under these rules, and no two items of a type may share prompt text.
