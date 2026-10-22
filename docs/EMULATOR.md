@@ -229,8 +229,10 @@ release build needs about 10 GB free and fails on Windows when the project path 
      alone: `$env:OLLAMA_HOST='0.0.0.0:11435'; ollama serve`. Windows Firewall must allow
      `ollama.exe` inbound; without it, writing falls back to the on-device score.
 
-The release build allows plain HTTP (`expo-build-properties`, `usesCleartextTraffic`) only so
-it can reach these local servers.
+Only the `apk` profile allows plain HTTP (`app.config.js` adds `usesCleartextTraffic` when
+`EAS_BUILD_PROFILE` is `apk`), so it can reach these local servers; other builds keep it off.
+Recordings and essays go to the address baked into the build, so use that APK on your own
+network only.
 
 ---
 

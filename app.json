@@ -49,15 +49,7 @@
           "microphonePermission": "Allow Qimma to record your answers to speaking tasks."
         }
       ],
-      "expo-sqlite",
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "usesCleartextTraffic": true
-          }
-        }
-      ]
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,
