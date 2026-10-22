@@ -1,0 +1,19 @@
+{
+  "cli": {
+    "version": ">= 25.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "apk": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_LOCAL_STT_URL": "http://192.168.8.53:8178",
+        "EXPO_PUBLIC_LOCAL_LLM_URL": "http://192.168.8.53:11435",
+        "EXPO_PUBLIC_LOCAL_LLM_MODEL": "qwen3:8b"
+      }
+    }
+  }
+}
