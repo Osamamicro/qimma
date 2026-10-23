@@ -33,6 +33,24 @@ describe('transcribeRecording', () => {
     expect(await transcribeRecording('file:///a.m4a', cfg(hang))).toBeNull();
   });
 
+  it('posts to the hosted function with the public key when no local server is set', async () => {
+    const fetchImpl = vi.fn(() => ok({ text: 'Hosted words.', confidence: 0.8 }));
+    const hosted = { hostedUrl: 'https://x.supabase.co/functions/v1/transcribe', key: 'anon', fetch: fetchImpl, timeoutMs: 50, part };
+    expect(transcriptionEnabled(hosted)).toBe(true);
+    expect(await transcribeRecording('file:///a.m4a', hosted)).toEqual({ transcript: 'Hosted words.', confidence: 0.8 });
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe('https://x.supabase.co/functions/v1/transcribe');
+    expect(init.headers).toEqual({ apikey: 'anon', Authorization: 'Bearer anon' });
+  });
+
+  it('prefers the local server over the hosted function and sends it no key', async () => {
+    const fetchImpl = vi.fn(() => ok({ text: 'x' }));
+    await transcribeRecording('file:///a.m4a', { ...cfg(fetchImpl), hostedUrl: 'https://x/transcribe', key: 'anon' });
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe('http://10.0.2.2:8178/v1/audio/transcriptions');
+    expect(init.headers).toBeUndefined();
+  });
+
   it('is off without a URL and never calls the network', async () => {
     const fetchImpl = vi.fn(() => ok({ text: 'x' }));
     expect(transcriptionEnabled(cfg(fetchImpl, ''))).toBe(false);

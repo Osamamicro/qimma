@@ -103,7 +103,7 @@ export function RecordPanel({ prepSec, responseSec, mode, ready = true, autoStar
           {!capture.recognitionSupported && (
             <Text variant="small" tone="faint">
               {capture.transcriptionAvailable
-                ? 'Your recording is transcribed on your computer and scored for content. Fluency and pronunciation are not estimated on phones yet.'
+                ? 'Your recording is transcribed and scored for content. Fluency and pronunciation are not estimated on phones yet.'
                 : 'Automatic speech scoring runs in the web app on Chrome or Edge. Here you can record, listen back and self-rate.'}
             </Text>
           )}

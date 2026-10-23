@@ -10,9 +10,9 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_LOCAL_STT_URL": "http://192.168.8.53:8178",
-        "EXPO_PUBLIC_LOCAL_LLM_URL": "http://192.168.8.53:11435",
-        "EXPO_PUBLIC_LOCAL_LLM_MODEL": "qwen3:8b"
+        "EXPO_PUBLIC_STT_API_URL": "https://fsdpabhmcyaaybvrwznm.supabase.co/functions/v1/transcribe",
+        "EXPO_PUBLIC_SCORING_API_URL": "https://fsdpabhmcyaaybvrwznm.supabase.co/functions/v1/score-writing",
+        "EXPO_PUBLIC_SUPABASE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzZHBhYmhtY3lhYXlidnJ3em5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzMzA3MTEsImV4cCI6MjEwNzkwNjcxMX0.RXgCIC2UMF-6tqSAgLM84AADuKis4b_dcFMMA_eLo7E"
       }
     }
   }
