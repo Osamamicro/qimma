@@ -7,7 +7,8 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
  * provider and never stored here.
  *
  * Function secrets:
- *   LLM_API_KEY   required (the same provider key as score-writing)
+ *   LLM_API_KEY   required (the same provider key as score-writing). Use a free-tier key with no
+ *                 billing: the public anon key gates this function, so quota is the abuse limit.
  *   STT_BASE_URL  default https://api.groq.com/openai/v1
  *   STT_MODEL     default whisper-large-v3-turbo (MIT open weights)
  */
@@ -15,7 +16,8 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 const BASE_URL = (Deno.env.get('STT_BASE_URL') ?? 'https://api.groq.com/openai/v1').replace(/\/$/, '');
 const MODEL = Deno.env.get('STT_MODEL') ?? 'whisper-large-v3-turbo';
 const API_KEY = Deno.env.get('LLM_API_KEY');
-const MAX_BYTES = 10 * 1024 * 1024; // a 2-minute AAC answer is ~2 MB
+// A 2-minute AAC answer is ~2 MB; the cap limits how much free provider quota one call can use.
+const MAX_BYTES = 4 * 1024 * 1024;
 const MAX_SECONDS = 150; // longest PTE speaking window is 120 s
 const TIMEOUT_MS = 30_000;
 // Whisper invents short phrases ("Thank you.") from silence; drop segments it marks as no speech.
