@@ -54,6 +54,7 @@ export function PracticePlayer({ item, onNext }: { item: Item; onNext?: () => vo
       {result && (
         <ScoreCard
           result={result}
+          taskType={item.type}
           answerLabel={spec.hasModelAnswer ? 'Model answer' : 'Correct answer'}
           onRetry={() => {
             setResult(null);

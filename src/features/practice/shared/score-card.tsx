@@ -2,11 +2,13 @@ import { View } from 'react-native';
 import Animated, { FadeInUp, ReduceMotion } from 'react-native-reanimated';
 
 import { Button, Card, Chip, ProgressBar, Row, Text } from '@/components/ui';
-import type { ScoreResult, WordMark } from '@/core';
+import { getTaskType, toPteScale, type ScoreResult, type SkillId, type TaskTypeId, type WordMark } from '@/core';
 import { motion, space, useColors } from '@/theme';
 
 export interface ScoreCardProps {
   result: ScoreResult;
+  /** Shows which PTE skills the question counts toward, with its share of each. */
+  taskType?: TaskTypeId;
   answerLabel?: string;
   onRetry?: () => void;
   onNext?: () => void;
@@ -15,7 +17,7 @@ export interface ScoreCardProps {
 // The result rises into place once, so the learner sees that their answer was scored.
 const ENTER = FadeInUp.duration(motion.base).reduceMotion(ReduceMotion.System);
 
-export function ScoreCard({ result, answerLabel = 'Answer', onRetry, onNext }: ScoreCardProps) {
+export function ScoreCard({ result, taskType, answerLabel = 'Answer', onRetry, onNext }: ScoreCardProps) {
   const c = useColors();
   const pct = Math.round(result.percent * 100);
   const scoreColor = result.max === 0 ? c.text : pct >= 79 ? c.success : pct >= 50 ? c.text : c.warning;
@@ -26,17 +28,25 @@ export function ScoreCard({ result, answerLabel = 'Answer', onRetry, onNext }: S
           {result.max === 0 ? (
             <Text variant="heading">Self-review saved</Text>
           ) : (
-            <Row gap={space.sm} style={{ alignItems: 'baseline' }}>
-              <Text variant="title" style={{ color: scoreColor, fontVariant: ['tabular-nums'] }}>
-                {`${result.total}/${result.max}`}
+            <View style={{ gap: 2 }}>
+              {/* PTE reports every score on 10–90; the same linear scale as the progress estimate. */}
+              <Row gap={space.sm} style={{ alignItems: 'baseline' }}>
+                <Text variant="title" style={{ color: scoreColor, fontVariant: ['tabular-nums'] }}>
+                  {toPteScale(result.percent)}
+                </Text>
+                <Text tone="muted" style={{ fontVariant: ['tabular-nums'] }}>
+                  / 90
+                </Text>
+              </Row>
+              <Text variant="small" tone="muted" style={{ fontVariant: ['tabular-nums'] }}>
+                {`${result.total} of ${result.max} points · ${pct}%`}
               </Text>
-              <Text tone="muted" style={{ fontVariant: ['tabular-nums'] }}>
-                {`${pct}%`}
-              </Text>
-            </Row>
+            </View>
           )}
           {result.estimated && <Chip label="Estimate" />}
         </Row>
+
+        {taskType && result.max > 0 && <SkillShares taskType={taskType} />}
 
         {result.traits.length > 1 && (
           <View style={{ gap: space.sm }}>
@@ -119,5 +129,18 @@ function ReadingMarks({ marks }: { marks: WordMark[] }) {
           : 'Every word was read in order with no long pauses.'}
       </Text>
     </View>
+  );
+}
+
+const SKILL_NAME: Record<SkillId, string> = { speaking: 'Speaking', writing: 'Writing', reading: 'Reading', listening: 'Listening' };
+
+/** The skills this task type feeds in PTE Academic, with its share of each (official weighting). */
+function SkillShares({ taskType }: { taskType: TaskTypeId }) {
+  const shares = Object.entries(getTaskType(taskType).skills) as [SkillId, number][];
+  if (shares.length === 0) return null;
+  return (
+    <Text variant="small" tone="muted">
+      {`Counts toward ${shares.map(([skill, pct]) => `${SKILL_NAME[skill]} (${pct}%)`).join(' and ')}`}
+    </Text>
   );
 }
