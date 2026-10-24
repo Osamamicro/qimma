@@ -1,3 +1,5 @@
+import type { TimedWord } from '@/core';
+
 /*
  * Speech-to-text for recordings made where no live recogniser exists (phones), ADR-015/016.
  * - Local: EXPO_PUBLIC_LOCAL_STT_URL points at the qimma-stt server (tools/stt-server: Whisper on
@@ -24,6 +26,8 @@ export interface SttConfig {
 export interface Transcription {
   transcript: string;
   confidence: number | null;
+  /** Word timings from the hosted function (the local server does not send them). */
+  words: TimedWord[] | null;
 }
 
 // Warm Vulkan transcription was ~3 s for 5 s of speech; a 40 s answer on a cold start needs more.
@@ -76,9 +80,13 @@ export async function transcribeRecording(audioUri: string, config = defaultConf
       signal: controller.signal,
     });
     if (!res.ok) return null;
-    const data = (await res.json()) as { text?: unknown; confidence?: unknown };
+    const data = (await res.json()) as { text?: unknown; confidence?: unknown; words?: unknown };
     if (typeof data.text !== 'string') return null;
-    return { transcript: data.text.trim(), confidence: typeof data.confidence === 'number' ? data.confidence : null };
+    return {
+      transcript: data.text.trim(),
+      confidence: typeof data.confidence === 'number' ? data.confidence : null,
+      words: Array.isArray(data.words) ? (data.words as TimedWord[]) : null,
+    };
   } catch {
     return null;
   } finally {

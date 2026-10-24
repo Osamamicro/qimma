@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import Animated, { FadeInUp, ReduceMotion } from 'react-native-reanimated';
 
 import { Button, Card, Chip, ProgressBar, Row, Text } from '@/components/ui';
-import type { ScoreResult } from '@/core';
+import type { ScoreResult, WordMark } from '@/core';
 import { motion, space, useColors } from '@/theme';
 
 export interface ScoreCardProps {
@@ -56,6 +56,8 @@ export function ScoreCard({ result, answerLabel = 'Answer', onRetry, onNext }: S
           </View>
         )}
 
+        {result.marks && <ReadingMarks marks={result.marks} />}
+
         {result.feedback.length > 0 && (
           <View style={{ gap: space.xs }}>
             {result.feedback.map((f, i) => (
@@ -83,5 +85,39 @@ export function ScoreCard({ result, answerLabel = 'Answer', onRetry, onNext }: S
         )}
       </Card>
     </Animated.View>
+  );
+}
+
+/** The reference text coloured word by word: missed, heard differently, and long pauses. */
+function ReadingMarks({ marks }: { marks: WordMark[] }) {
+  const c = useColors();
+  const look = (m: WordMark) =>
+    m.status === 'missed'
+      ? { color: c.danger, backgroundColor: c.dangerSoft, textDecorationLine: 'line-through' as const }
+      : m.status === 'wrong'
+        ? { color: c.warning, backgroundColor: c.warningSoft, textDecorationLine: 'underline' as const }
+        : undefined;
+  const issues = marks.some((m) => m.status !== 'ok' || m.pauseAfter);
+  return (
+    <View style={{ gap: space.xs }}>
+      <Text variant="small" tone="muted" style={{ fontWeight: '600' }}>
+        What you read
+      </Text>
+      <Text selectable style={{ lineHeight: 26 }}>
+        {marks.map((m, i) => (
+          <Text key={i}>
+            <Text style={look(m)}>{m.text}</Text>
+            {m.status === 'wrong' && m.heard ? <Text variant="small" style={{ color: c.warning }}>{` (${m.heard})`}</Text> : null}
+            {m.pauseAfter ? <Text style={{ color: c.danger, fontWeight: '700' }}>{' |'}</Text> : null}
+            {i < marks.length - 1 ? ' ' : ''}
+          </Text>
+        ))}
+      </Text>
+      <Text variant="small" tone="muted">
+        {issues
+          ? 'Red crossed out: missed. Orange underlined: heard as the word in brackets. | : long pause.'
+          : 'Every word was read in order with no long pauses.'}
+      </Text>
+    </View>
   );
 }

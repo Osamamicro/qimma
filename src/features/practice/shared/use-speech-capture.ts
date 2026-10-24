@@ -80,6 +80,7 @@ export function useSpeechCapture() {
       // null = no transcript this time (no recogniser, no server, or it failed): the panel asks for self-review.
       transcript: whisper ? whisper.transcript : null,
       confidence: whisper?.confidence ?? null,
+      words: whisper?.words ?? null,
       transcriptSource: whisper ? 'whisper' : undefined,
       durationMs,
       audioUri,

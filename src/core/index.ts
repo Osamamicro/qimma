@@ -3,6 +3,7 @@ export * from './exams/registry';
 export * from './content/types';
 export * from './content/audio-script';
 export * from './content/validate';
+export * from './content/model-answer';
 export * from './scoring';
 export * from './scoring/ai';
 export * from './srs/sm2';

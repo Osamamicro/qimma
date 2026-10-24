@@ -66,6 +66,8 @@ export interface Alignment {
   insertions: number;
   /** For each reference word: true if it was matched in order. */
   matchedRef: boolean[];
+  /** For each reference word: the hypothesis word aligned to it (match or substitution), or null. */
+  refToHyp: (number | null)[];
 }
 
 /** Levenshtein alignment of hypothesis words against reference words. */
@@ -82,6 +84,7 @@ export function align(ref: string[], hyp: string[]): Alignment {
     }
   }
   const matchedRef = new Array<boolean>(n).fill(false);
+  const refToHyp = new Array<number | null>(n).fill(null);
   let i = n;
   let j = m;
   let matches = 0;
@@ -90,6 +93,7 @@ export function align(ref: string[], hyp: string[]): Alignment {
   let insertions = 0;
   while (i > 0 || j > 0) {
     if (i > 0 && j > 0 && d[i][j] === d[i - 1][j - 1] + (ref[i - 1] === hyp[j - 1] ? 0 : 1)) {
+      refToHyp[i - 1] = j - 1;
       if (ref[i - 1] === hyp[j - 1]) {
         matches++;
         matchedRef[i - 1] = true;
@@ -106,7 +110,7 @@ export function align(ref: string[], hyp: string[]): Alignment {
       j--;
     }
   }
-  return { matches, substitutions, deletions, insertions, matchedRef };
+  return { matches, substitutions, deletions, insertions, matchedRef, refToHyp };
 }
 
 /** Does the token sequence contain the phrase (both stemmed)? */

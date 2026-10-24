@@ -293,3 +293,20 @@ essays leave the device for Groq (US), which the privacy note should state. The 
 gates the functions, so the abuse limit is the free quota (about 1,000 essays and 2,000
 recordings a day): keep the Groq key without billing. Per-user limits come with accounts
 (backlog item 9).
+
+## ADR-017 — Fluency and pronunciation estimates on phones, and marked reading
+
+**Context.** With content-only phone scoring (ADR-015), the owner and a beginner both scored 4/5
+on Read Aloud: Whisper writes most mispronounced words correctly, and fluency and pronunciation
+were not scored at all, so nothing separated a hesitant reader from a fluent one.
+
+**Decision.** The transcribe function returns word timings and keeps fillers (prompted). Phone
+transcripts now get **fluency** (rate over the spoken span, fillers, long mid-sentence pauses) and
+**pronunciation** (Whisper confidence on a stretched scale), labelled as estimates. Read Aloud and
+Repeat Sentence results colour the text by word (missed, heard differently, pause). Practice shows
+a model answer on request and reads it aloud with the device voice.
+
+**Consequences.** A slow, hesitant reading now loses several points even when every word is
+recognised (unit test). The scales are guesses until calibrated against rated recordings; a
+mispronunciation that Whisper still hears as the right word is not caught. A phoneme-level model
+(an open wav2vec2 pronunciation scorer) would need its own GPU host and is a later option.

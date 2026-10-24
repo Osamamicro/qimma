@@ -1,7 +1,7 @@
-import type { KeyPoint, ScoreResult, SpeechResponse, TraitScore } from '../content/types';
+import type { KeyPoint, ScoreResult, SpeechResponse, TimedWord, TraitScore, WordMark } from '../content/types';
 import { getTaskType } from '../exams/registry';
 import type { TaskTypeId, TraitId } from '../exams/types';
-import { align, band, clamp, hesitationCount, keyPointCoverage, repetitionCount, tokenize } from './text';
+import { align, band, clamp, hesitationCount, keyPointCoverage, repetitionCount, tokenize, type Alignment } from './text';
 import { ON_TOPIC_FLOOR } from './writing';
 
 /*
@@ -72,10 +72,81 @@ function noTranscript(taskType: TaskTypeId, response: SpeechResponse, answer?: s
   return build(taskType, values, feedback, answer, response.selfRating == null ? spec.traits.map((t) => t.id) : unscored);
 }
 
-/** ADR-004: transcripts of phone recordings score content only, not fluency or pronunciation. */
-const PHONE_NOTE = 'Fluency and pronunciation are not estimated from phone recordings yet; content is scored from a transcript of your recording.';
-function phoneOnly(response: SpeechResponse): TraitId[] {
-  return response.transcriptSource === 'whisper' ? ['fluency', 'pronunciation'] : [];
+/** ADR-017: Whisper transcripts get fluency and pronunciation estimates, labelled as such. */
+const PHONE_NOTE =
+  'Phone estimate: fluency comes from your speaking rate, fillers and long pauses; pronunciation from how clearly the speech model understood you. A mispronounced word that still sounds like the right word is not caught.';
+
+/**
+ * Long hesitations, one flag per word: Whisper folds the silence after a word into that word, so a
+ * pause shows as a word that runs well past its expected length (or as a gap before the next one).
+ * Pauses after punctuation are natural and not counted.
+ */
+export function pausesAfter(words: TimedWord[]): boolean[] {
+  return words.map((w, i) => {
+    if (i === words.length - 1 || /[.,;:!?]$/.test(w.word)) return false;
+    const letters = w.word.replace(/[^\p{L}]/gu, '').length;
+    const excess = w.end - w.start - (0.15 + 0.07 * letters);
+    const gap = words[i + 1].start - w.end;
+    return excess > 0.6 || gap > 0.6;
+  });
+}
+
+/** Fluency 0..5 from timed words: rate over the spoken span (not the silence around it), minus pauses. */
+export function timedFluencyBand(words: TimedWord[], responseSec: number): number {
+  if (words.length === 0) return 0;
+  const tokens = tokenize(words.map((w) => w.word).join(' '));
+  const spanMs = (words[words.length - 1].end - words[0].start) * 1000;
+  const pauses = pausesAfter(words).filter(Boolean).length;
+  return clamp(fluencyBand(tokens, spanMs, responseSec) - Math.min(2, Math.floor(pauses / 2)), 0, 5);
+}
+
+/**
+ * Pronunciation 0..5 from Whisper's mean segment probability. Clear speech scores about 0.85;
+ * the scale is stretched so that unclear speech (around 0.6) loses marks. Uncalibrated (ADR-017).
+ */
+export function whisperPronunciationBand(confidence: number | null | undefined, recognisedRatio: number): number {
+  const clarity = confidence == null ? recognisedRatio : clamp((confidence - 0.45) / 0.4, 0, 1);
+  return band(clarity * 0.7 + recognisedRatio * 0.3, 5);
+}
+
+/** The reference text word by word, marked against the transcript, with long pauses. */
+function referenceMarks(reference: string, a: Alignment, hyp: string[], hypPause: boolean[]): WordMark[] {
+  let r = 0;
+  return reference
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((text): WordMark => {
+      if (tokenize(text).length === 0) return { text, status: 'ok' };
+      const i = r++;
+      const j = a.refToHyp[i];
+      const status = a.matchedRef[i] ? 'ok' : j == null ? 'missed' : 'wrong';
+      return {
+        text,
+        status,
+        heard: status === 'wrong' && j != null ? hyp[j] : undefined,
+        pauseAfter: j != null && hypPause[j] ? true : undefined,
+      };
+    });
+}
+
+/** Transcript words for scoring; with timings, one pause flag per word as well. */
+function hypothesis(response: SpeechResponse): { hyp: string[]; pause: boolean[]; timed: TimedWord[] | null } {
+  const timed = response.transcriptSource === 'whisper' && response.words?.length ? response.words : null;
+  if (!timed) {
+    const hyp = tokenize(response.transcript ?? '');
+    return { hyp, pause: hyp.map(() => false), timed: null };
+  }
+  const flags = pausesAfter(timed);
+  const hyp: string[] = [];
+  const pause: boolean[] = [];
+  timed.forEach((w, k) => {
+    const t = tokenize(w.word);
+    t.forEach((tok, n) => {
+      hyp.push(tok);
+      pause.push(n === t.length - 1 && flags[k]);
+    });
+  });
+  return { hyp, pause, timed };
 }
 
 /** Read Aloud (content 0..5) and Repeat Sentence (content 0..3): reference alignment. */
@@ -87,7 +158,7 @@ export function scoreReferenceSpeech(
   const answer = taskType === 'repeat-sentence' ? reference : undefined;
   if (response.transcript == null) return noTranscript(taskType, response, answer);
   const ref = tokenize(reference);
-  const hyp = tokenize(response.transcript);
+  const { hyp, pause, timed } = hypothesis(response);
   const a = align(ref, hyp);
   const ratio = ref.length === 0 ? 0 : a.matches / ref.length;
   const errors = a.substitutions + a.deletions + a.insertions;
@@ -105,15 +176,21 @@ export function scoreReferenceSpeech(
   if (missed.length > 0) feedback.push(`Missed: ${missed.slice(0, 12).join(', ')}${missed.length > 12 ? '…' : ''}`);
 
   const spec = getTaskType(taskType);
-  values.fluency = fluencyBand(hyp, response.durationMs, spec.timing.responseSec ?? 40);
-  values.pronunciation = pronunciationBand(response.confidence, ratio);
+  const responseSec = spec.timing.responseSec ?? 40;
+  const whisper = response.transcriptSource === 'whisper';
+  values.fluency = timed ? timedFluencyBand(timed, responseSec) : fluencyBand(hyp, response.durationMs, responseSec);
+  values.pronunciation = whisper ? whisperPronunciationBand(response.confidence, ratio) : pronunciationBand(response.confidence, ratio);
   if (values.content === 0) {
     // PTE: no content means fluency and pronunciation are not credited.
     values.fluency = 0;
     values.pronunciation = 0;
   }
-  if (response.transcriptSource === 'whisper') feedback.push(PHONE_NOTE);
-  return build(taskType, values, feedback, answer, phoneOnly(response));
+  const pauses = pause.filter(Boolean).length;
+  const fillers = hesitationCount(hyp);
+  if (pauses > 0) feedback.push(`${pauses} long pause(s) mid-sentence (marked | in the text). Pause only at commas and full stops.`);
+  if (fillers > 0) feedback.push(`${fillers} filler(s) such as "um" or "uh". Keep going instead, even after a slip.`);
+  if (whisper) feedback.push(PHONE_NOTE);
+  return { ...build(taskType, values, feedback, answer), marks: referenceMarks(reference, a, hyp, pause) };
 }
 
 const POLITE_MARKERS = ['please', 'could you', 'would you', 'would it be', 'i was wondering', 'sorry', 'apologise', 'apologize', 'thank', 'appreciate', 'excuse me', 'i understand'];
@@ -126,7 +203,7 @@ export function scoreOpenSpeech(
   response: SpeechResponse,
 ): ScoreResult {
   if (response.transcript == null) return noTranscript(taskType, response, modelAnswer);
-  const hyp = tokenize(response.transcript);
+  const { hyp, timed } = hypothesis(response);
   const coverage = keyPointCoverage(response.transcript, keyPoints);
   const feedback: string[] = [];
   const values: TraitValues = {};
@@ -148,16 +225,18 @@ export function scoreOpenSpeech(
     feedback.push(`Missing: ${coverage.missed.map((k) => (k.speaker ? `${k.speaker}: ${k.label}` : k.label)).join('; ')}`);
 
   const spec = getTaskType(taskType);
-  values.fluency = fluencyBand(hyp, response.durationMs, spec.timing.responseSec ?? 40);
+  const responseSec = spec.timing.responseSec ?? 40;
+  const whisper = response.transcriptSource === 'whisper';
+  values.fluency = timed ? timedFluencyBand(timed, responseSec) : fluencyBand(hyp, response.durationMs, responseSec);
   // No reference text: use how much was recognised against the expected length of the window.
-  const expectedWords = ((spec.timing.responseSec ?? 40) * 0.8 * 130) / 60;
-  values.pronunciation = pronunciationBand(response.confidence, clamp(hyp.length / expectedWords, 0, 1));
+  const recognised = clamp(hyp.length / ((responseSec * 0.8 * 130) / 60), 0, 1);
+  values.pronunciation = whisper ? whisperPronunciationBand(response.confidence, recognised) : pronunciationBand(response.confidence, recognised);
   if (values[contentId] === 0) {
     values.fluency = 0;
     values.pronunciation = 0;
   }
-  if (response.transcriptSource === 'whisper') feedback.push(PHONE_NOTE);
-  return build(taskType, values, feedback, modelAnswer, phoneOnly(response));
+  if (whisper) feedback.push(PHONE_NOTE);
+  return build(taskType, values, feedback, modelAnswer);
 }
 
 /** Answer Short Question: 1 if any accepted answer is said. */
