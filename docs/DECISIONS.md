@@ -282,8 +282,10 @@ security review). The owner has no paid APIs; a GPU VM would cost about 75–990
 **Decision.** The `apk` build calls two Supabase Edge Functions over HTTPS, both backed by Groq's
 free tier with open-weight models: `transcribe` (`whisper-large-v3-turbo`, new) and the existing
 `score-writing` (`gpt-oss-120b`, ADR-014). One secret, `LLM_API_KEY`, configures both. The
-transcribe function keeps no audio, caps uploads at 4 MB, and drops segments Whisper marks as no
-speech or that are punctuation only (silence used to come back as "Thank you."). A local server
+transcribe function keeps no audio, caps uploads at 4 MB, and blanks silence hallucinations
+("Thank you.", "I'm sorry."): punctuation-only segments, known silence phrases, and transcripts of
+three words or fewer at under 0.25 words a second (Groq reports `no_speech_prob` as 0, so that
+field alone cannot be used). A local server
 (ADR-014/015) still takes precedence when its URL is set, for development.
 
 **Consequences.** Speaking takes about 2 s and an essay about 3 s on mobile data. Recordings and
