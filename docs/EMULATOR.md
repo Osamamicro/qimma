@@ -219,20 +219,17 @@ The APK is built in the cloud with EAS, so no Android build tools are needed on 
 release build needs about 10 GB free and fails on Windows when the project path is long).
 
 1. Once: `npx eas-cli@latest login` (free Expo account; the project is `osamasdn-team/qimma`).
-2. In `eas.json`, profile `apk`, set the two URLs to your PC's Wi-Fi address (`ipconfig`).
-   They are built into the app, so rebuild when that address changes.
-3. Build: `npx eas-cli@latest build -p android --profile apk`. When it finishes, open the
+2. Build: `npx eas-cli@latest build -p android --profile apk`. When it finishes, open the
    build page on the phone and install the APK (allow "install unknown apps" for the browser).
-4. On the PC, start what the phone calls (same Wi-Fi):
-   - Whisper: `dotnet run -c Release` in `tools/stt-server` (port 8178).
-   - Ollama for writing scoring: a second instance on all interfaces, leaving your usual one
-     alone: `$env:OLLAMA_HOST='0.0.0.0:11435'; ollama serve`. Windows Firewall must allow
-     `ollama.exe` inbound; without it, writing falls back to the on-device score.
 
-Only the `apk` profile allows plain HTTP (`app.config.js` adds `usesCleartextTraffic` when
-`EAS_BUILD_PROFILE` is `apk`), so it can reach these local servers; other builds keep it off.
-Recordings and essays go to the address baked into the build, so use that APK on your own
-network only.
+The `apk` profile uses the hosted Supabase functions over HTTPS (ADR-016), so speaking and
+writing are scored anywhere with internet, with no PC running:
+- `transcribe`: open-weight Whisper (`whisper-large-v3-turbo`) via Groq, for speaking content.
+- `score-writing`: open-weight `gpt-oss-120b` via Groq, for writing traits.
+
+Both read one function secret, `LLM_API_KEY` (a free Groq key with no billing, set in the
+Supabase dashboard under Edge Functions > Secrets). Without internet the app scores on the
+device: objective tasks exactly, writing with the heuristic estimate, speaking by self-review.
 
 ---
 

@@ -27,7 +27,7 @@ Australian Home Affairs scale, R69 L70 S88 W85 on PTE Academic.
 | Features | Practice player, full/mini/section mocks + report, vocab SRS (SM-2), daily plan, progress, settings, progress backup (JSON export/import with merge, storage-failure banner; ADR-013). |
 | Quality | `tsc` clean, ESLint clean (`expo lint`, in CI), Vitest 302/302, web export OK; the main flows were checked manually and with headless Playwright during development at a 390px viewport (no e2e specs are committed). |
 | Emulator | `scripts/setup-android-emulator.{ps1,sh}` (one-time setup) + `npm run emulator:android`. |
-| Phone STT | Optional local Whisper server `tools/stt-server` (ADR-015): speaking tasks on phones get content scores when `EXPO_PUBLIC_LOCAL_STT_URL` is set. |
+| Phone app | Android APK built on EAS (`eas.json` profile `apk`, project `osamasdn-team/qimma`; `docs/EMULATOR.md` §5.1). It scores speaking (Whisper) and writing (gpt-oss-120b) through the hosted `transcribe` and `score-writing` Supabase functions on Groq's free tier (ADR-016; secret `LLM_API_KEY`). The local Whisper server (ADR-015) remains for development. |
 
 **Verified on the owner's Windows PC (2026-10-18):** the setup script, the emulator launcher,
 the app in Expo Go (SDK 58) on an Android 36 emulator, Repeat Sentence text-to-speech, and
