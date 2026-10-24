@@ -78,7 +78,8 @@ Deno.serve(async (req) => {
     const data = (await res.json()) as { text?: string; duration?: number; segments?: Segment[] };
     if ((data.duration ?? 0) > MAX_SECONDS) return json(400, { error: `Recording longer than ${MAX_SECONDS} s.` });
 
-    const segments = (data.segments ?? []).filter((s) => (s.no_speech_prob ?? 0) < NO_SPEECH);
+    // Speech only: drop segments marked as no speech and punctuation-only ones (silence gives ".").
+    const segments = (data.segments ?? []).filter((s) => (s.no_speech_prob ?? 0) < NO_SPEECH && /[\p{L}\p{N}]/u.test(s.text));
     const text = data.segments ? segments.map((s) => s.text.trim()).filter(Boolean).join(' ') : (data.text ?? '').trim();
     const probs = segments.map((s) => Math.exp(s.avg_logprob ?? 0));
     return json(200, {
