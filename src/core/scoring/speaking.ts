@@ -172,8 +172,11 @@ export function scoreReferenceSpeech(
     values.content = a.matches === ref.length ? 3 : ratio >= 0.5 ? 2 : ratio >= 0.1 ? 1 : 0;
     feedback.push(`You repeated ${a.matches} of ${ref.length} words in order.`);
   }
-  const missed = ref.filter((_, i) => !a.matchedRef[i]);
-  if (missed.length > 0) feedback.push(`Missed: ${missed.slice(0, 12).join(', ')}${missed.length > 12 ? '…' : ''}`);
+  const list = (words: string[]) => `${words.slice(0, 12).join(', ')}${words.length > 12 ? '…' : ''}`;
+  const missed = ref.filter((_, i) => a.refToHyp[i] == null);
+  const misheard = ref.flatMap((w, i) => (!a.matchedRef[i] && a.refToHyp[i] != null ? [`${w} → ${hyp[a.refToHyp[i]!]}`] : []));
+  if (missed.length > 0) feedback.push(`Missed: ${list(missed)}`);
+  if (misheard.length > 0) feedback.push(`Heard differently: ${list(misheard)}`);
 
   const spec = getTaskType(taskType);
   const responseSec = spec.timing.responseSec ?? 40;
