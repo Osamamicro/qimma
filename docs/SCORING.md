@@ -44,9 +44,14 @@ Needs a transcript (web: browser speech recognition).
   ("Missing: Daniel: Smell and pests").
 - **Fluency**: speaking rate (110–170 wpm best), hesitations, repetitions, use of the window.
 - **Pronunciation**: recogniser confidence blended with recognition rate (a proxy, not phonetics).
-- Phones with the local Whisper server (ADR-015): the recording is transcribed on the PC and
-  scored for **content only**; fluency and pronunciation show "not scored", because those
-  heuristics were tuned on browser-recogniser output and are not calibrated for Whisper.
+- Phones (Whisper transcript, ADR-015/016/017): content as above; **fluency** from the word
+  timings (rate over the spoken span, fillers such as "um", and long mid-sentence pauses: a word
+  that runs 0.6 s past its expected length); **pronunciation** from Whisper's confidence,
+  stretched so clear speech (~0.85) scores high and unclear speech (~0.6) loses marks. Both are
+  uncalibrated estimates. Whisper often writes a mispronounced word correctly, so content and
+  pronunciation can still be generous; true sound-level checking needs a phoneme model.
+- Read Aloud and Repeat Sentence results show the text word by word: missed (red, crossed out),
+  heard differently (orange, with what was heard), and long pauses ( | ).
 - No transcript (Expo Go on phones without the server, or when it fails): the learner self-rates
   content; fluency and pronunciation are shown as "—" rather than invented.
 

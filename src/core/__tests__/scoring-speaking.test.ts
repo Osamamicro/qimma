@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { KeyPoint, ScoreResult, SpeechResponse, TraitId } from '@/core';
 import {
   fluencyBand,
+  pausesAfter,
   pronunciationBand,
   scoreOpenSpeech,
   scoreReferenceSpeech,
@@ -201,27 +202,53 @@ describe('open speech (key-point coverage)', () => {
   });
 });
 
-describe('Whisper transcripts from phone recordings (ADR-004, ADR-015)', () => {
-  it('scores content but leaves fluency and pronunciation unscored', () => {
-    const r = scoreReferenceSpeech('read-aloud', RA_TEXT, speech('The quick brown fox jumps over the lazy dog', 30000, { transcriptSource: 'whisper', confidence: 0.9 }));
-    expect(trait(r, 'content').score).toBe(5);
-    expect(trait(r, 'fluency').unscored).toBe(true);
-    expect(trait(r, 'pronunciation').unscored).toBe(true);
-    expect(r.max).toBe(trait(r, 'content').max);
-    expect(r.feedback.some((f) => f.includes('phone recordings'))).toBe(true);
+describe('Whisper transcripts from phone recordings (ADR-017)', () => {
+  // Evenly timed words: `gap` seconds of silence folded into each word, as Whisper reports it.
+  const timed = (text: string, wordSec: number, pauseAfter: number[] = []) => {
+    let t = 0;
+    return text.split(' ').map((word, i) => {
+      const start = t;
+      t += wordSec + (pauseAfter.includes(i) ? 1.5 : 0);
+      return { word, start, end: t };
+    });
+  };
+  const LONG = 'The museum opened a new gallery last spring and visitors can now explore ancient maps rare coins and models of early ships in one quiet room';
+
+  it('scores a hesitant beginner below a fluent reader on the same passage', () => {
+    const fluent = scoreReferenceSpeech('read-aloud', LONG, speech(LONG, 40000, { transcriptSource: 'whisper', confidence: 0.86, words: timed(LONG, 0.42) }));
+    const slow = 'The museum opened a um new gallery last spring and visitors can now uh explore ancient maps rare coins and models of early ships in one quiet room';
+    const beginner = scoreReferenceSpeech('read-aloud', LONG, speech(slow, 40000, { transcriptSource: 'whisper', confidence: 0.6, words: timed(slow, 0.9, [3, 9, 15, 21]) }));
+    expect(trait(fluent, 'fluency').score).toBeGreaterThanOrEqual(4);
+    expect(trait(fluent, 'pronunciation').score).toBeGreaterThanOrEqual(4);
+    expect(trait(beginner, 'fluency').score).toBeLessThanOrEqual(1);
+    expect(trait(beginner, 'pronunciation').score).toBeLessThan(trait(fluent, 'pronunciation').score);
+    expect(beginner.total).toBeLessThan(fluent.total - 4);
+    expect(beginner.max).toBe(fluent.max);
+    expect(beginner.feedback.join(' ')).toContain('long pause');
   });
 
-  it('applies the same rule to open tasks', () => {
+  it('marks the passage: missed, heard differently, and a pause after a word', () => {
+    const words = timed('The quick brown fax jumps over the dog', 0.4, [2]);
+    const r = scoreReferenceSpeech('read-aloud', RA_TEXT, speech('The quick brown fax jumps over the dog', 20000, { transcriptSource: 'whisper', confidence: 0.8, words }));
+    const by = (text: string) => r.marks!.find((m) => m.text.replace(/\W/g, '') === text)!;
+    expect(by('brown').pauseAfter).toBe(true);
+    expect(by('fox')).toMatchObject({ status: 'wrong', heard: 'fax' });
+    expect(by('lazy').status).toBe('missed');
+    expect(by('quick').status).toBe('ok');
+    expect(r.marks!.map((m) => m.text).join(' ')).toBe(RA_TEXT);
+  });
+
+  it('does not count pauses after punctuation', () => {
+    expect(pausesAfter([{ word: 'Friday.', start: 0, end: 2 }, { word: 'Then', start: 2, end: 2.3 }])).toEqual([false, false]);
+    expect(pausesAfter([{ word: 'Friday', start: 0, end: 2 }, { word: 'then', start: 2, end: 2.3 }])).toEqual([true, false]);
+  });
+
+  it('scores fluency and pronunciation for open tasks too', () => {
     const points: KeyPoint[] = [{ label: 'Trend', keywords: ['increase'] }];
-    const r = scoreOpenSpeech('describe-image', points, 'model', speech('the chart shows an increase over time', 30000, { transcriptSource: 'whisper' }));
-    expect(trait(r, 'fluency').unscored).toBe(true);
-    expect(trait(r, 'pronunciation').unscored).toBe(true);
-    expect(trait(r, 'content').unscored).toBeUndefined();
-  });
-
-  it('keeps browser transcripts fully scored', () => {
-    const r = scoreReferenceSpeech('read-aloud', RA_TEXT, speech('The quick brown fox jumps over the lazy dog', 30000, { transcriptSource: 'browser' }));
+    const text = 'the chart shows an increase over time';
+    const r = scoreOpenSpeech('describe-image', points, 'model', speech(text, 30000, { transcriptSource: 'whisper', confidence: 0.85, words: timed(text, 0.4) }));
     expect(trait(r, 'fluency').unscored).toBeUndefined();
+    expect(trait(r, 'pronunciation').unscored).toBeUndefined();
   });
 });
 

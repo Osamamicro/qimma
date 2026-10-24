@@ -2,6 +2,7 @@
   "expo": {
     "name": "Qimma",
     "slug": "qimma",
+    "owner": "osamasdn-team",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -53,6 +54,16 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "5f6ff476-cd91-4ac3-a044-24eafbf5b43c"
+      }
     }
   }
 }

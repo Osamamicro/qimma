@@ -289,10 +289,11 @@ export interface SpeechResponse {
   durationMs: number;
   /**
    * Where the transcript came from: the browser's live recogniser, or a Whisper transcription of
-   * the recording (phones, ADR-015). Whisper transcripts score content only until fluency and
-   * pronunciation are calibrated for them (ADR-004).
+   * the recording (phones, ADR-015/016). Whisper fluency and pronunciation are estimates (ADR-017).
    */
   transcriptSource?: 'browser' | 'whisper';
+  /** Word timings from the hosted Whisper, used for fluency (spoken span, pauses). */
+  words?: TimedWord[] | null;
   /** Mean recogniser confidence 0..1 when the engine reports it. */
   confidence?: number | null;
   audioUri?: string | null;
@@ -344,6 +345,23 @@ export interface TraitScore {
   unscored?: boolean;
 }
 
+/** One recognised word with its timing in seconds. */
+export interface TimedWord {
+  word: string;
+  start: number;
+  end: number;
+}
+
+/** A reference word marked against what was heard (Read Aloud, Repeat Sentence). */
+export interface WordMark {
+  text: string;
+  status: 'ok' | 'missed' | 'wrong';
+  /** What was heard instead, for 'wrong'. */
+  heard?: string;
+  /** A long hesitation came right after this word. */
+  pauseAfter?: boolean;
+}
+
 export interface ScoreResult {
   traits: TraitScore[];
   total: number;
@@ -355,6 +373,8 @@ export interface ScoreResult {
   feedback: string[];
   /** Human-readable correct answer or model answer to reveal after submitting. */
   answer?: string;
+  /** Read Aloud / Repeat Sentence: the reference text, word by word, marked against the transcript. */
+  marks?: WordMark[];
 }
 
 // ---------- Vocabulary & guides ----------

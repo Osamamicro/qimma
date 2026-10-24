@@ -7,7 +7,7 @@ import { scoreResponse } from '@/services/ai-scoring';
 import { recordAttempt } from '@/services/app-state';
 
 import { ItemRenderer } from './renderers';
-import { ScoreCard } from './shared';
+import { ModelAnswer, ScoreCard } from './shared';
 
 /** Practice flow for one item: render → submit → score → feedback → retry/next. */
 export function PracticePlayer({ item, onNext }: { item: Item; onNext?: () => void }) {
@@ -41,6 +41,7 @@ export function PracticePlayer({ item, onNext }: { item: Item; onNext?: () => vo
         <Text variant="heading">{item.title}</Text>
         <Text tone="muted">{spec.instructions}</Text>
       </View>
+      <ModelAnswer key={item.id} item={item} />
       <ItemRenderer key={`${item.id}-${round}`} item={item} mode="practice" onSubmit={submit} result={result} />
       {scoring && (
         <Row style={{ justifyContent: 'space-between' }}>
@@ -53,6 +54,7 @@ export function PracticePlayer({ item, onNext }: { item: Item; onNext?: () => vo
       {result && (
         <ScoreCard
           result={result}
+          taskType={item.type}
           answerLabel={spec.hasModelAnswer ? 'Model answer' : 'Correct answer'}
           onRetry={() => {
             setResult(null);

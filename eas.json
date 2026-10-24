@@ -1,0 +1,19 @@
+{
+  "cli": {
+    "version": ">= 25.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "apk": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_STT_API_URL": "https://fsdpabhmcyaaybvrwznm.supabase.co/functions/v1/transcribe",
+        "EXPO_PUBLIC_SCORING_API_URL": "https://fsdpabhmcyaaybvrwznm.supabase.co/functions/v1/score-writing",
+        "EXPO_PUBLIC_SUPABASE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzZHBhYmhtY3lhYXlidnJ3em5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzMzA3MTEsImV4cCI6MjEwNzkwNjcxMX0.RXgCIC2UMF-6tqSAgLM84AADuKis4b_dcFMMA_eLo7E"
+      }
+    }
+  }
+}

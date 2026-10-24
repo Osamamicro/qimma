@@ -213,6 +213,24 @@ the server through Windows Firewall when it asks (private networks only).
 Keep Expo Go up to date. If Expo Go says the project needs a newer version, update Expo Go
 from the store and scan the code again.
 
+### 5.1 Install Qimma as an app (APK, no Expo Go)
+
+The APK is built in the cloud with EAS, so no Android build tools are needed on the PC (a local
+release build needs about 10 GB free and fails on Windows when the project path is long).
+
+1. Once: `npx eas-cli@latest login` (free Expo account; the project is `osamasdn-team/qimma`).
+2. Build: `npx eas-cli@latest build -p android --profile apk`. When it finishes, open the
+   build page on the phone and install the APK (allow "install unknown apps" for the browser).
+
+The `apk` profile uses the hosted Supabase functions over HTTPS (ADR-016), so speaking and
+writing are scored anywhere with internet, with no PC running:
+- `transcribe`: open-weight Whisper (`whisper-large-v3-turbo`) via Groq, for speaking content.
+- `score-writing`: open-weight `gpt-oss-120b` via Groq, for writing traits.
+
+Both read one function secret, `LLM_API_KEY` (a free Groq key with no billing, set in the
+Supabase dashboard under Edge Functions > Secrets). Without internet the app scores on the
+device: objective tasks exactly, writing with the heuristic estimate, speaking by self-review.
+
 ---
 
 ## 6. Web app (browser)
