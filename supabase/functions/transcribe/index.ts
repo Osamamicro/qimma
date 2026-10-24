@@ -84,7 +84,11 @@ Deno.serve(async (req) => {
     // Speech only: drop segments marked as no speech and punctuation-only ones (silence gives ".").
     const segments = (data.segments ?? []).filter((s) => (s.no_speech_prob ?? 0) < NO_SPEECH && /[\p{L}\p{N}]/u.test(s.text));
     let text = data.segments ? segments.map((s) => s.text.trim()).filter(Boolean).join(' ') : (data.text ?? '').trim();
-    const silent = SILENCE_PHRASES.has(text.toLowerCase().replace(/[^\p{L}\s]/gu, '').trim().replace(/\s+/g, ' '));
+    // Groq reports no_speech_prob as 0, so also catch hallucinations by rate: a near-silent
+    // 15 s recording comes back as two words ("I'm sorry."), real speech is ~2 words a second.
+    const words = text.split(/\s+/).filter(Boolean).length;
+    const sparse = words <= 3 && (data.duration ?? 0) > 0 && words / data.duration! < 0.25;
+    const silent = sparse || SILENCE_PHRASES.has(text.toLowerCase().replace(/[^\p{L}\s]/gu, '').trim().replace(/\s+/g, ' '));
     if (silent) text = '';
     const probs = silent ? [] : segments.map((s) => Math.exp(s.avg_logprob ?? 0));
     return json(200, {
