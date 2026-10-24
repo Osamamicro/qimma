@@ -22,6 +22,9 @@ const MAX_SECONDS = 150; // longest PTE speaking window is 120 s
 const TIMEOUT_MS = 30_000;
 // Whisper invents short phrases ("Thank you.") from silence; drop segments it marks as no speech.
 const NO_SPEECH = 0.6;
+// Its usual silence hallucinations. A whole answer that is only one of these is treated as empty;
+// longer answers that contain them are kept.
+const SILENCE_PHRASES = new Set(['thank you', 'thanks', 'thank you for watching', 'thanks for watching', 'you', 'bye', 'okay', 'so']);
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -80,8 +83,10 @@ Deno.serve(async (req) => {
 
     // Speech only: drop segments marked as no speech and punctuation-only ones (silence gives ".").
     const segments = (data.segments ?? []).filter((s) => (s.no_speech_prob ?? 0) < NO_SPEECH && /[\p{L}\p{N}]/u.test(s.text));
-    const text = data.segments ? segments.map((s) => s.text.trim()).filter(Boolean).join(' ') : (data.text ?? '').trim();
-    const probs = segments.map((s) => Math.exp(s.avg_logprob ?? 0));
+    let text = data.segments ? segments.map((s) => s.text.trim()).filter(Boolean).join(' ') : (data.text ?? '').trim();
+    const silent = SILENCE_PHRASES.has(text.toLowerCase().replace(/[^\p{L}\s]/gu, '').trim().replace(/\s+/g, ' '));
+    if (silent) text = '';
+    const probs = silent ? [] : segments.map((s) => Math.exp(s.avg_logprob ?? 0));
     return json(200, {
       text,
       duration: data.duration ?? null,
